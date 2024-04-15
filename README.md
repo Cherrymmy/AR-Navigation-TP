@@ -1,7 +1,7 @@
 
 ![header](https://capsule-render.vercel.app/api?text=AR_Navigation&animation=fadeIn)
 
-# 여기도 매인 사진 넣기
+# 메인 사진
 
 # 📚Stack
 ![js](https://img.shields.io/badge/C%23-239120?style=for-the-badge&logo=c-sharp&logoColor=white)
