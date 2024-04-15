@@ -1,12 +1,14 @@
 
 ![header](https://capsule-render.vercel.app/api?text=AR_Navigation&animation=fadeIn)
-# Stack
+
+# 여기도 매인 사진 넣기
+
+# 📚Stack
 ![js](https://img.shields.io/badge/C%23-239120?style=for-the-badge&logo=c-sharp&logoColor=white)
 ![js](https://img.shields.io/badge/Unity-100000?style=for-the-badge&logo=unity&logoColor=white)
 ![js](https://img.shields.io/badge/Google-4285F4?logo=google&logoColor=fff&style=for-the-badge)
 
-***
-# Team
+# 👯Team
 
 <table>
   <tr>
@@ -42,15 +44,16 @@
   </tr>
 </table>
 
-# Topic
-
+# 💫Topic💫
+>
 ***
-# Summary
+# 📖Summary📖
 >
 ***
 
 
-# Ket Function
+# Key Function
 >
-
 ***
+
+# 이미지 넣기 
