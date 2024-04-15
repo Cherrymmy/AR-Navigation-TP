@@ -39,7 +39,7 @@
        <a href="https://github.com/msgugu">@msgugu</a>  
     </td>
     <td>
-       <a href="https://github.com/msgugu">@msgugu</a>  
+       <a href="https://github.com/yewon4139">@yewon4139</a>  
     </td>
   </tr>
 </table>
