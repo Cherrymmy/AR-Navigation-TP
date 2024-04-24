@@ -19,13 +19,6 @@
     <th>박예원</th>
   </tr>
   <tr>
-    <td>사진</td>
-    <td>사진</td>
-    <td>사진</td>
-    <td>사진</td>
-    <td>사진</td>
-  </tr>
-  <tr>
     <td>
        <a href="https://github.com/blase148">@blase148</a>  
     </td>
