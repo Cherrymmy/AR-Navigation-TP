@@ -16,11 +16,15 @@ namespace AR.Models
     {
         public PlacesResponse PlacesData { get; private set; } // 파싱된 데이터 저장
 
-        public DataManager datamanager;
         public UnityEvent<string> OnDataReceived;
-        public UnityEvent OnDataParsed;  // 파싱된 데이터를 알리는 이벤트
+        public UnityEvent OnDataParsed;                         // 파싱된 데이터를 알리는 이벤트
+        public UnityEvent OnDataUpdated;
 
-        string apiKey = "AIzaSyCsyqqXiR26jn_xlk5UTmDdKdKqLoHyw1U";
+        string _apiKey = "AIzaSyCsyqqXiR26jn_xlk5UTmDdKdKqLoHyw1U";
+
+        private void Start()
+        {
+        }
 
         #region api 요청
         public void SearchPlaces(string query)
@@ -32,7 +36,7 @@ namespace AR.Models
         {
             string fields = "name,place_id";
             string language = "ko";
-            string url = $"https://maps.googleapis.com/maps/api/place/textsearch/json?query={query}&language={language}&fields={fields}&key={apiKey}";
+            string url = $"https://maps.googleapis.com/maps/api/place/textsearch/json?query={query}&language={language}&fields={fields}&key={_apiKey}";
 
             using (UnityWebRequest webRequest = UnityWebRequest.Get(url))
             {
@@ -46,7 +50,7 @@ namespace AR.Models
                 {
                     string response = webRequest.downloadHandler.text;
                     OnDataReceived.Invoke(response); // ??? 이거 데이터 수신 성공 이벤트 발생
-                    DestoryData();
+                    DestroyData();
                     ParseData(response);
                 }
             }
@@ -59,7 +63,7 @@ namespace AR.Models
             OnDataParsed.Invoke();  // 데이터 파싱 완료 이벤트 발생
         }
 
-        private void DestoryData()
+        private void DestroyData()
         {
             if (PlacesData != null && PlacesData.results != null)
             {
@@ -69,12 +73,12 @@ namespace AR.Models
 
         public void SaveData(string name,string place_id)
         {
-            datamanager.AddPlaceIdData(name, place_id);
+            DataManager.Instance.AddPlaceIdData(name, place_id);
         }
 
-        private void LoadData(string name)
+        public void LoadDataDelete(string name)
         {
-            datamanager.RemovePlaceIdData(name);
+            DataManager.Instance.RemovePlaceIdData(name);
         }
         #endregion
     }
@@ -91,12 +95,4 @@ namespace AR.Models
         public string name;
         public string place_id;
     }
-
-    [System.Serializable]
-    public class PlacesDatas
-    {
-        public List<PlaceResult> datas;
-    }
-
-
 }

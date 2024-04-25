@@ -399,12 +399,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e2fd9c28a39f7d489e69d21ad00fb46, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  placesModel: {fileID: 1614935349}
   onPlacesProcessed:
     m_PersistentCalls:
       m_Calls: []
-  searchListTransform: {fileID: 1968318179}
-  searchList: {fileID: 381390271764804275, guid: 007b575057e0a8048a9a85eed95844bb, type: 3}
+  OnCreateButtonRequested:
+    m_PersistentCalls:
+      m_Calls: []
+  OnLodeCreateButtonRequested:
+    m_PersistentCalls:
+      m_Calls: []
+  OnDeleteButton:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!4 &389292624
 Transform:
   m_ObjectHideFlags: 0
@@ -1187,11 +1193,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dc7a9ada40a7dee449ca1291055c49a9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  datamanager: {fileID: 0}
   OnDataReceived:
     m_PersistentCalls:
       m_Calls: []
   OnDataParsed:
+    m_PersistentCalls:
+      m_Calls: []
+  OnDataUpdated:
     m_PersistentCalls:
       m_Calls: []
 --- !u!4 &1614935350
@@ -1277,6 +1285,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5841ec15a428bf54cb6d6dde87c52f50, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  searchListTransform: {fileID: 1968318179}
+  searchListPrefabs:
+  - {fileID: 3655935470910852666, guid: 007b575057e0a8048a9a85eed95844bb, type: 3}
+  - {fileID: 3655935470910852666, guid: 007b575057e0a8048a9a85eed95844bb, type: 3}
 --- !u!114 &1742111441
 MonoBehaviour:
   m_ObjectHideFlags: 0

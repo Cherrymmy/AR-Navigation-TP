@@ -42,6 +42,11 @@ namespace AR
             }
         }
 
+        private void Start()
+        {
+            LoadPlacesDatas();
+        }
+
         /// <summary>
         /// 제네릭 메서드로, 어떤 타입의 데이터든 JSON으로 변환하여 파일에 저장합니다.
         /// </summary>
