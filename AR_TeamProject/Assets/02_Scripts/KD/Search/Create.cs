@@ -1,7 +1,7 @@
 using TMPro;
 using UnityEngine;
 
-namespace Search
+namespace AR
 {
     public class Create : MonoBehaviour
     {
@@ -15,13 +15,13 @@ namespace Search
 
         public void CreateButton(string text, int index)
         {
-            // ÇÁ¸®ÆéÀ» ÀÎ½ºÅÏ½ºÈ­ÇÕ´Ï´Ù.
+            // í”„ë¦¬í©ì„ ì¸ìŠ¤í„´ìŠ¤í™”í•©ë‹ˆë‹¤.
             GameObject newButton = Instantiate(buttonPrefab[index], parentPanel.transform);
 
-            // ÀÎ½ºÅÏ½ºÈ­µÈ ¹öÆ°¿¡¼­ TextMeshPro ÄÄÆ÷³ÍÆ®¸¦ Ã£½À´Ï´Ù.
+            // ì¸ìŠ¤í„´ìŠ¤í™”ëœ ë²„íŠ¼ì—ì„œ TextMeshPro ì»´í¬ë„ŒíŠ¸ë¥¼ ì°¾ìŠµë‹ˆë‹¤.
             TMP_Text tmpText = newButton.GetComponentInChildren<TMP_Text>();
 
-            // ÅØ½ºÆ® ÄÄÆ÷³ÍÆ®°¡ ÀÖ´Ù¸é, ±× ³»¿ëÀ» º¯°æÇÕ´Ï´Ù.
+            // í…ìŠ¤íŠ¸ ì»´í¬ë„ŒíŠ¸ê°€ ìˆë‹¤ë©´, ê·¸ ë‚´ìš©ì„ ë³€ê²½í•©ë‹ˆë‹¤.
             if (tmpText != null)
             {
                 tmpText.text = text;

@@ -2,12 +2,12 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
-namespace Search
+namespace AR
 {
-    public class DataManager : MonoBehaviour, IJsonDataManager
+    public class DataManager : MonoBehaviour
     {
         /// <summary>
-        /// Áö³­ °Ë»ö ¸ñ·Ï ÀúÀå
+        /// ì§€ë‚œ ê²€ìƒ‰ ëª©ë¡ ì €ì¥
         /// </summary>
         [System.Serializable]
         public class PlaceIdData
@@ -25,25 +25,25 @@ namespace Search
 
 
         public static DataManager Instance { get; private set; }
-        // JSON µ¥ÀÌÅÍ¸¦ ´ã´Â ¼Ó¼ºÀÔ´Ï´Ù.
+        // JSON ë°ì´í„°ë¥¼ ë‹´ëŠ” ì†ì„±ì…ë‹ˆë‹¤.
 
 
         private void Awake()
         {
-            // ÀÎ½ºÅÏ½º°¡ nullÀÌ¸é ÇöÀç °´Ã¼¸¦ ÀÎ½ºÅÏ½º·Î ÁöÁ¤ÇÏ°í, ¾Æ´Ï¸é Áßº¹ ÀÎ½ºÅÏ½º¸¦ Á¦°ÅÇÕ´Ï´Ù.
+            // ì¸ìŠ¤í„´ìŠ¤ê°€ nullì´ë©´ í˜„ì¬ ê°ì²´ë¥¼ ì¸ìŠ¤í„´ìŠ¤ë¡œ ì§€ì •í•˜ê³ , ì•„ë‹ˆë©´ ì¤‘ë³µ ì¸ìŠ¤í„´ìŠ¤ë¥¼ ì œê±°í•©ë‹ˆë‹¤.
             if (Instance == null)
             {
                 Instance = this;
-                DontDestroyOnLoad(gameObject); // ¾À ÀüÈ¯ ½Ã ÆÄ±«µÇÁö ¾Êµµ·Ï ¼³Á¤ÇÕ´Ï´Ù.
+                DontDestroyOnLoad(gameObject); // ì”¬ ì „í™˜ ì‹œ íŒŒê´´ë˜ì§€ ì•Šë„ë¡ ì„¤ì •í•©ë‹ˆë‹¤.
             }
             else
             {
-                Destroy(gameObject); // Áßº¹ ÀÎ½ºÅÏ½º´Â Á¦°ÅÇÕ´Ï´Ù.
+                Destroy(gameObject); // ì¤‘ë³µ ì¸ìŠ¤í„´ìŠ¤ëŠ” ì œê±°í•©ë‹ˆë‹¤.
             }
         }
 
         /// <summary>
-        /// Á¦³×¸¯ ¸Ş¼­µå·Î, ¾î¶² Å¸ÀÔÀÇ µ¥ÀÌÅÍµç JSONÀ¸·Î º¯È¯ÇÏ¿© ÆÄÀÏ¿¡ ÀúÀåÇÕ´Ï´Ù.
+        /// ì œë„¤ë¦­ ë©”ì„œë“œë¡œ, ì–´ë–¤ íƒ€ì…ì˜ ë°ì´í„°ë“  JSONìœ¼ë¡œ ë³€í™˜í•˜ì—¬ íŒŒì¼ì— ì €ì¥í•©ë‹ˆë‹¤.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="data"></param>
@@ -51,72 +51,72 @@ namespace Search
         public void SaveData<T>(T data, string jsonPath)
         {
             string jsonData = JsonUtility.ToJson(data, true);
-            File.WriteAllText(jsonPath, jsonData); // ÆÄÀÏ ½Ã½ºÅÛ¿¡ JSON ¹®ÀÚ¿­À» ±â·ÏÇÕ´Ï´Ù.
+            File.WriteAllText(jsonPath, jsonData); // íŒŒì¼ ì‹œìŠ¤í…œì— JSON ë¬¸ìì—´ì„ ê¸°ë¡í•©ë‹ˆë‹¤.
             Debug.Log(jsonData);
         }
 
         /// <summary>
-        /// Á¦³×¸¯ ¸Ş¼­µå·Î, ÁöÁ¤µÈ °æ·Î¿¡¼­ JSON ÆÄÀÏÀ» ÀĞ°í T Å¸ÀÔÀÇ µ¥ÀÌÅÍ·Î º¯È¯ÇÕ´Ï´Ù.
+        /// ì œë„¤ë¦­ ë©”ì„œë“œë¡œ, ì§€ì •ëœ ê²½ë¡œì—ì„œ JSON íŒŒì¼ì„ ì½ê³  T íƒ€ì…ì˜ ë°ì´í„°ë¡œ ë³€í™˜í•©ë‹ˆë‹¤.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="jsonPath"></param>
         /// <returns></returns>
         public T LoadData<T>(string jsonPath)
         {
-            if (File.Exists(jsonPath)) // ÆÄÀÏÀÌ Á¸ÀçÇÏ´ÂÁö È®ÀÎÇÕ´Ï´Ù.
+            if (File.Exists(jsonPath)) // íŒŒì¼ì´ ì¡´ì¬í•˜ëŠ”ì§€ í™•ì¸í•©ë‹ˆë‹¤.
             {
-                string jsonData = File.ReadAllText(jsonPath); // ÆÄÀÏÀÇ ³»¿ëÀ» ÀĞ½À´Ï´Ù.
-                return JsonUtility.FromJson<T>(jsonData); // ÀĞÀº µ¥ÀÌÅÍ¸¦ JSON¿¡¼­ T Å¸ÀÔÀ¸·Î º¯È¯ÇÕ´Ï´Ù.
+                string jsonData = File.ReadAllText(jsonPath); // íŒŒì¼ì˜ ë‚´ìš©ì„ ì½ìŠµë‹ˆë‹¤.
+                return JsonUtility.FromJson<T>(jsonData); // ì½ì€ ë°ì´í„°ë¥¼ JSONì—ì„œ T íƒ€ì…ìœ¼ë¡œ ë³€í™˜í•©ë‹ˆë‹¤.
             }
-            return default(T); // ÆÄÀÏÀÌ ¾øÀ¸¸é T Å¸ÀÔÀÇ ±âº»°ªÀ» ¹İÈ¯ÇÕ´Ï´Ù.
+            return default(T); // íŒŒì¼ì´ ì—†ìœ¼ë©´ T íƒ€ì…ì˜ ê¸°ë³¸ê°’ì„ ë°˜í™˜í•©ë‹ˆë‹¤.
         }
 
         /// <summary>
-        /// ÀÌ¸§°ú place_id¸¦ ¹Ş¾Æ PlacesDatas¿¡ Ãß°¡ÇÏ´Â ¸Ş¼­µå
-        /// Áßº¹À» ÇÇÇÏ±â À§ÇØ ÀÌ¹Ì Á¸ÀçÇÏ´ÂÁö È®ÀÎÇÕ´Ï´Ù.
+        /// ì´ë¦„ê³¼ place_idë¥¼ ë°›ì•„ PlacesDatasì— ì¶”ê°€í•˜ëŠ” ë©”ì„œë“œ
+        /// ì¤‘ë³µì„ í”¼í•˜ê¸° ìœ„í•´ ì´ë¯¸ ì¡´ì¬í•˜ëŠ”ì§€ í™•ì¸í•©ë‹ˆë‹¤.
         /// </summary>
-        /// <param name="name"> °Ë»ö±â·Ï </param>
-        /// <param name="placeId"> Àå¼Ò id°ª </param>
+        /// <param name="name"> ê²€ìƒ‰ê¸°ë¡ </param>
+        /// <param name="placeId"> ì¥ì†Œ idê°’ </param>
         public void AddPlaceIdData(string name, string placeId)
         {
             string jsonPath = Path.Combine(Application.persistentDataPath, "places_datas.json");
             PlacesDatas placesDatas = LoadData<PlacesDatas>(jsonPath);
 
-            // placesDatas°¡ nullÀÌ ¾Æ´Ï°í datas ¸®½ºÆ®µµ nullÀÌ ¾Æ´ÑÁö È®ÀÎÇÕ´Ï´Ù.
+            // placesDatasê°€ nullì´ ì•„ë‹ˆê³  datas ë¦¬ìŠ¤íŠ¸ë„ nullì´ ì•„ë‹Œì§€ í™•ì¸í•©ë‹ˆë‹¤.
             if (placesDatas == null || placesDatas.datas == null)
             {
                 placesDatas = new PlacesDatas { datas = new List<PlaceIdData>() };
             }
 
-            // Áßº¹µÈ ÀÌ¸§ÀÌ ÀÖ´ÂÁö °Ë»çÇÕ´Ï´Ù.
+            // ì¤‘ë³µëœ ì´ë¦„ì´ ìˆëŠ”ì§€ ê²€ì‚¬í•©ë‹ˆë‹¤.
             if (!placesDatas.datas.Exists(p => p.Name == name))
             {
-                // Áßº¹µÇÁö ¾ÊÀº °æ¿ì »õ µ¥ÀÌÅÍ¸¦ ¸®½ºÆ®¿¡ Ãß°¡ÇÕ´Ï´Ù.
+                // ì¤‘ë³µë˜ì§€ ì•Šì€ ê²½ìš° ìƒˆ ë°ì´í„°ë¥¼ ë¦¬ìŠ¤íŠ¸ì— ì¶”ê°€í•©ë‹ˆë‹¤.
                 placesDatas.datas.Add(new PlaceIdData { Name = name, PlaceId = placeId });
-                SaveData(placesDatas, jsonPath); // º¯°æµÈ µ¥ÀÌÅÍ¸¦ ÀúÀåÇÕ´Ï´Ù.
+                SaveData(placesDatas, jsonPath); // ë³€ê²½ëœ ë°ì´í„°ë¥¼ ì €ì¥í•©ë‹ˆë‹¤.
             }
         }
 
         /// <summary>
-        /// µ¥ÀÌÅÍ »èÁ¦ ¸Ş¼­µå
+        /// ë°ì´í„° ì‚­ì œ ë©”ì„œë“œ
         /// </summary>
         /// <param name="name"></param>
         public void RemovePlaceIdData(string name)
         {
             string jsonPath = Path.Combine(Application.persistentDataPath, "places_datas.json");
-            LoadPlacesDatas(); // µ¥ÀÌÅÍ¸¦ ¸ÕÀú ·Îµå
+            LoadPlacesDatas(); // ë°ì´í„°ë¥¼ ë¨¼ì € ë¡œë“œ
 
             PlaceIdData itemToRemove = jsonDatas.datas.Find(x => x.Name == name);
             if (itemToRemove != null)
             {
-                jsonDatas.datas.Remove(itemToRemove); // µ¥ÀÌÅÍ »èÁ¦
-                SaveData(jsonDatas, jsonPath); // JSON ÆÄÀÏ ¾÷µ¥ÀÌÆ®
+                jsonDatas.datas.Remove(itemToRemove); // ë°ì´í„° ì‚­ì œ
+                SaveData(jsonDatas, jsonPath); // JSON íŒŒì¼ ì—…ë°ì´íŠ¸
             }
         }
 
         /// <summary>
-        /// ¾ÖÇÃ¸®ÄÉÀÌ¼Ç µ¥ÀÌÅÍ Æú´õ¿¡¼­ "places_datas.json" ÆÄÀÏÀ» ·ÎµåÇÕ´Ï´Ù.
-        /// ÆÄÀÏÀÌ ¾øÀ¸¸é ºó PlacesDatas¸¦ »ı¼ºÇÕ´Ï´Ù.
+        /// ì• í”Œë¦¬ì¼€ì´ì…˜ ë°ì´í„° í´ë”ì—ì„œ "places_datas.json" íŒŒì¼ì„ ë¡œë“œí•©ë‹ˆë‹¤.
+        /// íŒŒì¼ì´ ì—†ìœ¼ë©´ ë¹ˆ PlacesDatasë¥¼ ìƒì„±í•©ë‹ˆë‹¤.
         /// </summary>
         /// 
         public void LoadPlacesDatas()

@@ -3,10 +3,10 @@ using UnityEngine;
 using UnityEngine.Networking;
 
 /// <summary>
-/// API¿äÃ»
+/// APIìš”ì²­
 /// </summary>
 /// 
-namespace Search
+namespace AR
 {
     public class SearchAPI : MonoBehaviour, IJsonSearchService
     {
@@ -48,9 +48,9 @@ namespace Search
         }
 
         /// <summary>
-        /// places api ÅëÇØ¼­ Á¤º¸ ¹Ş¾Æ¿À±â
+        /// places api í†µí•´ì„œ ì •ë³´ ë°›ì•„ì˜¤ê¸°
         /// </summary>
-        /// <param name="query"> °Ë»ö text </param>
+        /// <param name="query"> ê²€ìƒ‰ text </param>
         /// <returns></returns>
         public IEnumerator SearchPlacesCoroutine(string query)
         {
@@ -60,21 +60,21 @@ namespace Search
 
             using (UnityWebRequest webRequest = UnityWebRequest.Get(url))
             {
-                // API ¿äÃ»À» º¸³À´Ï´Ù.
+                // API ìš”ì²­ì„ ë³´ëƒ…ë‹ˆë‹¤.
                 yield return webRequest.SendWebRequest();
 
-                // ³×Æ®¿öÅ© ¿¡·¯ ¶Ç´Â HTTP ¿¡·¯ Ã³¸®
+                // ë„¤íŠ¸ì›Œí¬ ì—ëŸ¬ ë˜ëŠ” HTTP ì—ëŸ¬ ì²˜ë¦¬
                 if (webRequest.isNetworkError || webRequest.isHttpError)
                 {
                     Debug.LogError(webRequest.error);
                 }
                 else
                 {
-                    // ÀÀ´äÀ» JSONÀ¸·Î º¯È¯
+                    // ì‘ë‹µì„ JSONìœ¼ë¡œ ë³€í™˜
                     string response = webRequest.downloadHandler.text;
                     jsonResponse = JsonUtility.FromJson<PlacesResponse>(response);
 
-                    // °Ë»ö °á°ú¸¦ ¹ÙÅÁÀ¸·Î UI ¹öÆ° »ı¼º
+                    // ê²€ìƒ‰ ê²°ê³¼ë¥¼ ë°”íƒ•ìœ¼ë¡œ UI ë²„íŠ¼ ìƒì„±
                     foreach (var result in jsonResponse.results)
                     {
                         createInstance.CreateButton(result.name, 0);
@@ -84,9 +84,9 @@ namespace Search
         }
 
         /// <summary>
-        /// Place Details °ª ¹Ş¾Æ¿À±â
+        /// Place Details ê°’ ë°›ì•„ì˜¤ê¸°
         /// </summary>
-        /// <param name="url"> details ¹Ş¾Æ¿À´Â ÁÖ¼Ò </param>
+        /// <param name="url"> details ë°›ì•„ì˜¤ëŠ” ì£¼ì†Œ </param>
         /// <returns></returns>
         public IEnumerator FetchPlaceDetails(string url)
         {
@@ -96,12 +96,12 @@ namespace Search
 
                 if (request.isNetworkError || request.isHttpError)
                 {
-                    Debug.LogError("»ó¼¼ Á¤º¸¸¦ °¡Á®¿À´Â Áß ¿À·ù ¹ß»ı: " + request.error);
-                    // »ç¿ëÀÚ¿¡°Ô ¾Ë¸®°Å³ª Àç½Ãµµ¸¦ °í·ÁÇÒ ¼ö ÀÖ½À´Ï´Ù.
+                    Debug.LogError("ìƒì„¸ ì •ë³´ë¥¼ ê°€ì ¸ì˜¤ëŠ” ì¤‘ ì˜¤ë¥˜ ë°œìƒ: " + request.error);
+                    // ì‚¬ìš©ìì—ê²Œ ì•Œë¦¬ê±°ë‚˜ ì¬ì‹œë„ë¥¼ ê³ ë ¤í•  ìˆ˜ ìˆìŠµë‹ˆë‹¤.
                 }
                 else
                 {
-                    Debug.Log("ÀÀ´ä: " + request.downloadHandler.text);
+                    Debug.Log("ì‘ë‹µ: " + request.downloadHandler.text);
                     PlaceDetailsResponse details = JsonUtility.FromJson<PlaceDetailsResponse>(request.downloadHandler.text);
 
                     if (details.status == "OK")
@@ -118,7 +118,7 @@ namespace Search
                             Debug.Log("Photo Width: " + photo.width);
                         }
 
-                        // ÇÊ¿äÇÑ °æ¿ì UI¸¦ »ó¼¼ Á¤º¸·Î ¾÷µ¥ÀÌÆ®ÇÒ ¼ö ÀÖ½À´Ï´Ù.
+                        // í•„ìš”í•œ ê²½ìš° UIë¥¼ ìƒì„¸ ì •ë³´ë¡œ ì—…ë°ì´íŠ¸í•  ìˆ˜ ìˆìŠµë‹ˆë‹¤.
                     }
                     else
                     {
@@ -129,26 +129,26 @@ namespace Search
 
 
         /// <summary>
-        /// ÀÌ¸§ È®ÀÎÈÄ Place Details¿¡ place_id ³Ñ±â±â
+        /// ì´ë¦„ í™•ì¸í›„ Place Detailsì— place_id ë„˜ê¸°ê¸°
         /// </summary>
-        /// <param name="name"> °¡°ÔÀÌ¸§ </param>
+        /// <param name="name"> ê°€ê²Œì´ë¦„ </param>
         public void Toss(string name)
         {
-            // search °ª¿¡ ÀÖÀ¸¸é ¿©±â¼­ µ¹°í
+            // search ê°’ì— ìˆìœ¼ë©´ ì—¬ê¸°ì„œ ëŒê³ 
             foreach (var result in jsonResponse.results)
             {
                 if (result.name == name)
                 {
-                    // °Ë»ö±â·Ï ÀúÀåÇÏ±â
+                    // ê²€ìƒ‰ê¸°ë¡ ì €ì¥í•˜ê¸°
                     DataManager.Instance.AddPlaceIdData(name, result.place_id);
                     string fields = "name,photos,geometry,vicinity,editorial_summary";
                     string placeDetailsUrl = $"https://maps.googleapis.com/maps/api/place/details/json?placeid={result.place_id}&fields={fields}&key={apiKey}&language=ko";
-                    // Place Detail °æµµ À§µµ ¹Ş±â
+                    // Place Detail ê²½ë„ ìœ„ë„ ë°›ê¸°
                     StartCoroutine(FetchPlaceDetails(placeDetailsUrl));
                     break;
                 }
             }
-            // °Ë»ö ±â·Ï¿¡ ÀÖÀ¸¸é ¿©±â ½ÇÇàÇÔ
+            // ê²€ìƒ‰ ê¸°ë¡ì— ìˆìœ¼ë©´ ì—¬ê¸° ì‹¤í–‰í•¨
             foreach (var data in DataManager.Instance.jsonDatas.datas)
             {
                 if (data.Name == name)

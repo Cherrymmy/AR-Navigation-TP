@@ -2,7 +2,7 @@ using System.Collections;
 using TMPro;
 using UnityEngine;
 
-namespace Search
+namespace AR
 {
     public class PlacesSearch : MonoBehaviour
     {
@@ -17,24 +17,24 @@ namespace Search
             create = FindObjectOfType<Create>();
             inputField = GetComponentInChildren<TMP_InputField>();
 
-            // InputFieldÀÇ °ªÀÌ º¯°æµÉ ¶§¸¶´Ù OnValueChange¸¦ È£Ãâ
+            // InputFieldì˜ ê°’ì´ ë³€ê²½ë  ë•Œë§ˆë‹¤ OnValueChangeë¥¼ í˜¸ì¶œ
             inputField.onValueChanged.AddListener(OnValueChange);
-            // delegate »ç¿ë ÇÏ´Â ÀÌÀ¯ ¿©·¯µ¿ÀÛ »ç¿ë, Á¶°ÇÀû ½ÇÇà, ¶÷´Ù½Ä Ç¥Çö
+            // delegate ì‚¬ìš© í•˜ëŠ” ì´ìœ  ì—¬ëŸ¬ë™ì‘ ì‚¬ìš©, ì¡°ê±´ì  ì‹¤í–‰, ëŒë‹¤ì‹ í‘œí˜„
             inputField.onSelect.AddListener(delegate { HandleSelect(); });
         }
 
         public void OnValueChange(string searchText)
         {
-            // destroy°¡ nullÀÌ ¾Æ´ÑÁö ¸ÕÀú È®ÀÎ
+            // destroyê°€ nullì´ ì•„ë‹Œì§€ ë¨¼ì € í™•ì¸
             if (destroy.placesearch != null)
             {
-                // ÀÔ·ÂµÈ ÅØ½ºÆ®°¡ ¾øÀ» ¶§ ¸ğµç °Ë»ö °á°ú¸¦ ÆÄ±«ÇÕ´Ï´Ù.
+                // ì…ë ¥ëœ í…ìŠ¤íŠ¸ê°€ ì—†ì„ ë•Œ ëª¨ë“  ê²€ìƒ‰ ê²°ê³¼ë¥¼ íŒŒê´´í•©ë‹ˆë‹¤.
                 if (string.IsNullOrEmpty(searchText))
                 {
-                    destroy.PrefabsDestroy();  // ±âÁ¸ °Ë»ö °á°ú¸¦ ÆÄ±«
+                    destroy.PrefabsDestroy();  // ê¸°ì¡´ ê²€ìƒ‰ ê²°ê³¼ë¥¼ íŒŒê´´
                     LoadDataAndCreateButtons();
                 }
-                // ÃÖ¼Ò 2±ÛÀÚ ÀÌ»ó ÀÔ·ÂµÇ¾úÀ» ¶§ °Ë»öÀ» ½ÃÀÛÇÕ´Ï´Ù.
+                // ìµœì†Œ 2ê¸€ì ì´ìƒ ì…ë ¥ë˜ì—ˆì„ ë•Œ ê²€ìƒ‰ì„ ì‹œì‘í•©ë‹ˆë‹¤.
                 else if (searchText.Length >= 2)
                 {
                     StartCoroutine(SearchAPI.Instance.SearchPlacesCoroutine(searchText));
@@ -42,19 +42,19 @@ namespace Search
             }
             else
             {
-                // destroy°¡ nullÀÌ¸é ¿©±â¼­ ¿À·ù ¸Ş½ÃÁö¸¦ ·Î±ëÇÏ°Å³ª ÀûÀıÇÑ Á¶Ä¡¸¦ ÃëÇÒ ¼ö ÀÖ½À´Ï´Ù.
+                // destroyê°€ nullì´ë©´ ì—¬ê¸°ì„œ ì˜¤ë¥˜ ë©”ì‹œì§€ë¥¼ ë¡œê¹…í•˜ê±°ë‚˜ ì ì ˆí•œ ì¡°ì¹˜ë¥¼ ì·¨í•  ìˆ˜ ìˆìŠµë‹ˆë‹¤.
                 Debug.LogWarning("Destroy component is not assigned or missing.");
             }
         }
 
         private void LoadDataAndCreateButtons()
         {
-            DataManager.Instance.LoadPlacesDatas();  // µ¥ÀÌÅÍ ·Îµå
+            DataManager.Instance.LoadPlacesDatas();  // ë°ì´í„° ë¡œë“œ
             if (DataManager.Instance.jsonDatas != null && DataManager.Instance.jsonDatas.datas != null)
             {
                 foreach (var data in DataManager.Instance.jsonDatas.datas)
                 {
-                    create.CreateButton(data.Name, 1);  // °¢ µ¥ÀÌÅÍ Ç×¸ñ¿¡ ´ëÇÑ ¹öÆ° »ı¼º
+                    create.CreateButton(data.Name, 1);  // ê° ë°ì´í„° í•­ëª©ì— ëŒ€í•œ ë²„íŠ¼ ìƒì„±
                 }
             }
             else
@@ -68,8 +68,8 @@ namespace Search
         {
             if (destroy != null)
             {
-                destroy.PrefabsDestroy();  // ±âÁ¸ °Ë»ö °á°ú¸¦ ÆÄ±«
-                LoadDataAndCreateButtons();  // jsonDatas¿¡¼­ µ¥ÀÌÅÍ ·Îµå ¹× ¹öÆ° »ı¼º
+                destroy.PrefabsDestroy();  // ê¸°ì¡´ ê²€ìƒ‰ ê²°ê³¼ë¥¼ íŒŒê´´
+                LoadDataAndCreateButtons();  // jsonDatasì—ì„œ ë°ì´í„° ë¡œë“œ ë° ë²„íŠ¼ ìƒì„±
             }
         }
     }
