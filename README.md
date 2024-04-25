@@ -1,5 +1,5 @@
 
-![header](https://capsule-render.vercel.app/api?text=AR_Navigation&animation=fadeIn)
+![header](https://capsule-render.vercel.app/api?type=Venom&color=auto&text=AR_Navigation&animation=fadeIn)
 
 # 메인 사진
 
