@@ -23,12 +23,12 @@ namespace AR.Views
 
         void Start()
         {
-            _input_Search.onValueChanged.AddListener((value) => OnSearchInputChanged(value));       // input 값에 따른 검색
-            //_input_Search.onSelect.AddListener(OnSearchInputSelect);                              // 문제있음
-            _viewModel.onPlacesProcessed.AddListener(DisplayPlaces);                                // UI 업데이트
-            _viewModel.OnDeleteButton.AddListener(DestroyPlaceObjects);                             // 리스트 프리펩 사제
-            _viewModel.OnCreateButtonRequested.AddListener(CreateButton);                           // places 검색 기록 생성
-            _viewModel.OnLodeCreateButtonRequested.AddListener(LoadDataAndCreateButton);            // 이전검색 기록 생성
+            _input_Search.onValueChanged.AddListener((value) => OnSearchInputChanged(value));       // PlacesViewModel/ input 값에 따른 검색
+            _input_Search.onSelect.AddListener(delegate { OnSearchInputSelect(); });                // PlacesViewModel/ input field 클릭시 이전 검색 기록 생성
+            _viewModel.onPlacesProcessed.AddListener(DisplayPlaces);                                // PlacesViewModel/ UI 업데이트
+            _viewModel.OnDeleteButton.AddListener(DestroyPlaceObjects);                             // PlacesViewModel/ 리스트 프리펩 사제
+            _viewModel.OnCreateButtonRequested.AddListener(CreateButton);                           // PlacesViewModel/ places 검색 기록 생성
+            _viewModel.OnLodeCreateButtonRequested.AddListener(LoadDataAndCreateButton);            // PlacesViewModel/ 이전검색 기록 생성
         }
 
         // 인풋 값이 변경이 되면 Place Search 
@@ -44,6 +44,7 @@ namespace AR.Views
         // 인풋 필드 활성화 되면 실행 
         private void OnSearchInputSelect()
         {
+            Debug.Log("OnSearchInputSelect()");
             _viewModel.LodeCreatButton();
         }
 

@@ -18,7 +18,7 @@ namespace AR.ViewModels
 
         public UnityEvent onPlacesProcessed;                            // view/ 데이터 로드 완료 이벤트
         public UnityEvent<string> OnCreateButtonRequested;              // view/ 검색기록 생성
-        public UnityEvent<string> OnLodeCreateButtonRequested;          // view/ 이전 기록 생성 ** 문제 있음
+        public UnityEvent<string> OnLodeCreateButtonRequested;          // view/ 이전 기록 생성 
         public UnityEvent OnDeleteButton;                               // view/ 리스트 삭제
 
 
@@ -30,8 +30,10 @@ namespace AR.ViewModels
         public void LodeCreatButton()
         {
             Debug.Log("이전 검색기록");
-            foreach(var data in DataManager.Instance.jsonDatas.datas)
+            Debug.Log(DataManager.Instance.jsonDatas.datas);
+            foreach (var data in DataManager.Instance.jsonDatas.datas)
             {
+                Debug.Log("도냐?");
                 string name = data.Name; 
                 OnLodeCreateButtonRequested.Invoke(name);
             }

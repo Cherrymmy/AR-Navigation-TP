@@ -100,6 +100,8 @@ namespace AR
                 placesDatas.datas.Add(new PlaceIdData { Name = name, PlaceId = placeId });
                 SaveData(placesDatas, jsonPath); // 변경된 데이터를 저장합니다.
             }
+
+            Debug.Log(jsonPath);
         }
 
         /// <summary>
@@ -126,6 +128,7 @@ namespace AR
         /// 
         public void LoadPlacesDatas()
         {
+            Debug.Log("이전기록 생성");
             string jsonPath = Path.Combine(Application.persistentDataPath, "places_datas.json");
             if (File.Exists(jsonPath))
             {
