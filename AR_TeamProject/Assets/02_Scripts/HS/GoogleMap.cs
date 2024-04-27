@@ -3,8 +3,10 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.Networking;
 using UnityEngine.UI;
+using UnityEngine.XR.ARFoundation;
 
 public class GoogleMap : MonoBehaviour
 {
@@ -51,6 +53,7 @@ public class GoogleMap : MonoBehaviour
     private bool _isGPSOn = true;
     private bool _isPinching;
     private bool _isDraging;
+    private bool _isUIRayCast;
     
     private float _zoomSpeed = 0.005f;
     public float DragSpeed 
@@ -151,7 +154,6 @@ public class GoogleMap : MonoBehaviour
 
     private IEnumerator GetGoogleMap(string path = "")
     {
-        //Debug.Log("zoom : " + zoom);
         url = "https://maps.googleapis.com/maps/api/staticmap?center=" + /*lat*/_gpsLat + "," + /*lon */_gpsLon +
                                                                                 "&zoom=" + _zoom +
                                                                                 "&size=" + mapWidth +
@@ -160,7 +162,7 @@ public class GoogleMap : MonoBehaviour
                                                                                 "&markers=" + "color:" + GoogleMapColor.purple + "|" + _markerLat + "," + _markerLon +
                                                                                 "&maptype=" + maptype +
                                                                                 "&key=" + apiKey +
-                                                                                /*"&path=color:0xff0000ff|weight:5" + */path; // 경로 추가;
+                                                                                path; // 도보 + 대중교통 경로 추가
 
 
         //mapIsLoading = true;
@@ -200,7 +202,6 @@ public class GoogleMap : MonoBehaviour
         // 드래그를 시작하면 목적지가 검색된 시점의 gps를 기준으로 폴리라인을 그림
         if (!_isGPSOn)
         {
-            //Debug.Log("목적지 O + 드래그 O");
             directionsUrl = "https://maps.googleapis.com/maps/api/directions/json?origin=" + _dragInitGPSLat + "," + _dragInitGPSLon +
                                     "&destination=" + _destinationLat + "," + _destinationLon +
                                     "&region=KR" +
@@ -216,8 +217,6 @@ public class GoogleMap : MonoBehaviour
                                     "&mode=transit" +
                                     "&key=" + directionsApiKey;
         }
-
-        //Debug.Log(directionsUrl);
 
         UnityWebRequest www = UnityWebRequest.Get(directionsUrl);
         yield return www.SendWebRequest();
@@ -332,6 +331,46 @@ public class GoogleMap : MonoBehaviour
         // 입력한 터치값이 1개 일 때
         if (Input.touchCount == 1)
         {
+            Touch touch = Input.GetTouch(0);
+
+            switch (touch.phase)
+            {
+                case TouchPhase.Began:
+                    {
+                        GraphicRaycaster raycaster = GetComponentInParent<GraphicRaycaster>();
+
+                        if (raycaster != null)
+                        {
+                            PointerEventData pointerEventData = new PointerEventData(EventSystem.current);
+
+                            pointerEventData.position = touch.position;
+
+                            List<RaycastResult> results = new List<RaycastResult>();
+
+                            raycaster.Raycast(pointerEventData, results);
+
+                            foreach (RaycastResult result in results)
+                            {
+                                if (result.gameObject.layer == LayerMask.NameToLayer("Map"))
+                                {
+                                    Debug.Log("Drag Touch");
+                                }
+                                else if (result.gameObject.layer == LayerMask.NameToLayer("UI"))
+                                {
+                                    Debug.Log("GPS Touch");
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                    break;
+                case TouchPhase.Moved:
+                    break;
+                default:
+                    break;
+            }
+
+            
             if (!_isDraging)
             {
                 _dragStartPos = Input.GetTouch(0).position;
@@ -344,15 +383,10 @@ public class GoogleMap : MonoBehaviour
 
             float horiziontalTouchDelta = (_dragStartPos.x - curTouchPos.x);
             float verticalTouchDelta = (_dragStartPos.y - curTouchPos.y);
-            //Debug.Log("horiziontalTouchDelta : " + horiziontalTouchDelta + "\nverticalTouchDelta :" + verticalTouchDelta);
-
-            
 
             // 좌우로 swipe 했다면
             if (Mathf.Abs(horiziontalTouchDelta * _dragSpeed) > 0f)
             {
-                //if (zoom >= 10)
-                //    horiziontalTouchDelta = horiziontalTouchDelta > 0 ? 0.0065f/2f : -0.0065f/2f;
                 Vector2 newpos = new Vector2(-horiziontalTouchDelta, 0);
                 _marker.rectTransform.anchoredPosition += newpos;
                 _gpsLon = _gpsLon + horiziontalTouchDelta * _dragSpeed;
@@ -361,16 +395,12 @@ public class GoogleMap : MonoBehaviour
             // 위아래로 swipe 했다면
             if (Mathf.Abs(verticalTouchDelta * _dragSpeed) > 0f)
             {
-                //if (zoom >= 10)
-                //    verticalTouchDelta = verticalTouchDelta > 0 ? 0.0058f/2f : -0.0058f/2f;
                 Vector2 newpos = new Vector2(0, -verticalTouchDelta);
                 _marker.rectTransform.anchoredPosition += newpos;
                 _gpsLat = _gpsLat + verticalTouchDelta * _dragSpeed;
             }
 
             _dragStartPos = curTouchPos;
-
-            //Debug.Log("Draging Lat : " + _dragLat + ", Draging Lot : " + _dragLon);
         }
         // 터치값이 1개가 아닐 때
         else
@@ -400,20 +430,40 @@ public class GoogleMap : MonoBehaviour
 
     public void OnSetOnDestination()
     {
-        // 목적지 야당역 설정
-        _destinationLat = 37.71275f;
-        _destinationLon = 126.7615f;
+        if (!EventSystem.current.IsPointerOverGameObject(Input.GetTouch(0).fingerId))
+        {
+            // 목적지 야당역 설정
+            _destinationLat = 37.71275f;
+            _destinationLon = 126.7615f;
 
-        _dragInitGPSLat = _gpsLat;
-        _dragInitGPSLon = _gpsLon;
+            _dragInitGPSLat = _gpsLat;
+            _dragInitGPSLon = _gpsLon;
+        }
+
     }
     public void OnSetOffDestination()
     {
-        // 목적지 초기화
-        _destinationLat = 0f;
-        _destinationLon = 0f;
+        if (!EventSystem.current.IsPointerOverGameObject(Input.GetTouch(0).fingerId))
+        {
+            // 목적지 초기화
+            _destinationLat = 0f;
+            _destinationLon = 0f;
 
-        _dragInitGPSLat = 0f;
-        _dragInitGPSLon = 0f;
+            _dragInitGPSLat = 0f;
+            _dragInitGPSLon = 0f;
+        }
+    }
+
+    public bool IsPointerOverUIObject()
+    {
+        PointerEventData eventDataCurrentPosition = new PointerEventData(EventSystem.current);
+
+        eventDataCurrentPosition.pointerId = Input.GetTouch(0).fingerId;
+
+        List<RaycastResult> results = new List<RaycastResult>();
+
+        EventSystem.current.RaycastAll(eventDataCurrentPosition, results);
+
+        return results.Count > 0;
     }
 }
