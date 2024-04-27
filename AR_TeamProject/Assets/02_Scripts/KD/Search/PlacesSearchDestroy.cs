@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-namespace Search
+namespace AR
 {
     public class PlacesSearchDestroy : MonoBehaviour
     {
@@ -9,46 +9,46 @@ namespace Search
 
         private Coroutine updateCoroutine;
 
-        // ÀÚ½ÄÀÌ º¯°æ µÇ¸é ½ÇÇàµÇ´Â ÇÔ¼ö
+        // ìì‹ì´ ë³€ê²½ ë˜ë©´ ì‹¤í–‰ë˜ëŠ” í•¨ìˆ˜
         public void OnTransformChildrenChanged()
         {
-            // ÀÌ¹Ì ½ÇÇà ÁßÀÎ ÄÚ·çÆ¾ÀÌ ÀÖ´Ù¸é ÁßÁö
+            // ì´ë¯¸ ì‹¤í–‰ ì¤‘ì¸ ì½”ë£¨í‹´ì´ ìˆë‹¤ë©´ ì¤‘ì§€
             if (updateCoroutine != null)
             {
                 StopCoroutine(updateCoroutine);
             }
 
-            // ÄÚ·çÆ¾ ½ÃÀÛ
+            // ì½”ë£¨í‹´ ì‹œì‘
             updateCoroutine = StartCoroutine(UpdatePlacesearchCoroutine());
         }
 
         private IEnumerator UpdatePlacesearchCoroutine()
         {
             PrefabsDestroy();
-            // ÀÚ½Ä °´Ã¼ÀÇ ¼ö¸¦ ¾òÀ½
+            // ìì‹ ê°ì²´ì˜ ìˆ˜ë¥¼ ì–»ìŒ
             int children = transform.childCount;
-            // ÀÓ½Ã ¹è¿­ ÃÊ±âÈ­
+            // ì„ì‹œ ë°°ì—´ ì´ˆê¸°í™”
             GameObject[] tempPlacesearch = new GameObject[children];
 
-            // ÀÚ½Ä °´Ã¼¸¦ ¹è¿­¿¡ ÀúÀå
+            // ìì‹ ê°ì²´ë¥¼ ë°°ì—´ì— ì €ì¥
             for (int i = 0; i < children; i++)
             {
                 tempPlacesearch[i] = transform.GetChild(i).gameObject;
 
-                // ¸Å ÀÚ½Ä °´Ã¼¸¶´Ù ÇÁ·¹ÀÓ Áö¿¬
+                // ë§¤ ìì‹ ê°ì²´ë§ˆë‹¤ í”„ë ˆì„ ì§€ì—°
                 if (i % 10 == 0)
                 {
                     yield return null;
                 }
             }
 
-            // ¸ğµç ÀÛ¾÷ ¿Ï·á ÈÄ ¸ŞÀÎ ¹è¿­¿¡ ÇÒ´ç
+            // ëª¨ë“  ì‘ì—… ì™„ë£Œ í›„ ë©”ì¸ ë°°ì—´ì— í• ë‹¹
             placesearch = tempPlacesearch;
         }
 
         public void PrefabsDestroy()
         {
-            // Àå¼Ò °Ë»ö °á°ú°¡ ÀÖ´Â °æ¿ì ±âÁ¸ °á°ú¸¦ »èÁ¦ÇÕ´Ï´Ù.
+            // ì¥ì†Œ ê²€ìƒ‰ ê²°ê³¼ê°€ ìˆëŠ” ê²½ìš° ê¸°ì¡´ ê²°ê³¼ë¥¼ ì‚­ì œí•©ë‹ˆë‹¤.
             if (placesearch != null && placesearch.Length > 0)
             {
                 for (int i = 0; i < placesearch.Length; i++)
