@@ -8,7 +8,7 @@ using UnityEngine.Networking;
 using UnityEngine.UI;
 using UnityEngine.XR.ARFoundation;
 
-public class GoogleMap : MonoBehaviour
+public class GoogleMap : MonoBehaviour, IPointerClickHandler
 {
     public string apiKey;       // 구글맵 api key
     public float lat = 0.0f;    // 위도
@@ -53,7 +53,6 @@ public class GoogleMap : MonoBehaviour
     private bool _isGPSOn = true;
     private bool _isPinching;
     private bool _isDraging;
-    private bool _isUIRayCast;
     
     private float _zoomSpeed = 0.005f;
     public float DragSpeed 
@@ -81,6 +80,7 @@ public class GoogleMap : MonoBehaviour
     private float _destinationLat;
     private float _destinationLon;
 
+    
     public enum GoogleMapColor
     {
         black,
@@ -333,42 +333,55 @@ public class GoogleMap : MonoBehaviour
         {
             Touch touch = Input.GetTouch(0);
 
-            switch (touch.phase)
+            if (Input.GetTouch(0).phase == TouchPhase.Began)
             {
-                case TouchPhase.Began:
-                    {
-                        GraphicRaycaster raycaster = GetComponentInParent<GraphicRaycaster>();
-
-                        if (raycaster != null)
-                        {
-                            PointerEventData pointerEventData = new PointerEventData(EventSystem.current);
-
-                            pointerEventData.position = touch.position;
-
-                            List<RaycastResult> results = new List<RaycastResult>();
-
-                            raycaster.Raycast(pointerEventData, results);
-
-                            foreach (RaycastResult result in results)
-                            {
-                                if (result.gameObject.layer == LayerMask.NameToLayer("Map"))
-                                {
-                                    Debug.Log("Drag Touch");
-                                }
-                                else if (result.gameObject.layer == LayerMask.NameToLayer("UI"))
-                                {
-                                    Debug.Log("GPS Touch");
-                                    return;
-                                }
-                            }
-                        }
-                    }
-                    break;
-                case TouchPhase.Moved:
-                    break;
-                default:
-                    break;
+                if (EventSystem.current.IsPointerOverGameObject(Input.GetTouch(0).fingerId))
+                {
+                    Debug.Log("Drag Touch");
+                }
+                else
+                {
+                    //Debug.Log("GPS Touch");
+                }
             }
+
+
+            //switch (touch.phase)
+            //{
+            //    case TouchPhase.Began:
+            //        {
+            //            GraphicRaycaster raycaster = GetComponentInParent<GraphicRaycaster>();
+
+            //            if (raycaster != null)
+            //            {
+            //                PointerEventData pointerEventData = new PointerEventData(EventSystem.current);
+
+            //                pointerEventData.position = touch.position;
+
+            //                List<RaycastResult> results = new List<RaycastResult>();
+
+            //                raycaster.Raycast(pointerEventData, results);
+
+            //                foreach (RaycastResult result in results)
+            //                {
+            //                    if (result.gameObject.layer == LayerMask.NameToLayer("Map"))
+            //                    {
+            //                        Debug.Log("Drag Touch");
+            //                    }
+            //                    else if (result.gameObject.layer == LayerMask.NameToLayer("UI"))
+            //                    {
+            //                        Debug.Log("GPS Touch");
+            //                        return;
+            //                    }
+            //                }
+            //            }
+            //        }
+            //        break;
+            //    case TouchPhase.Moved:
+            //        break;
+            //    default:
+            //        break;
+            //}
 
             
             if (!_isDraging)
@@ -424,8 +437,11 @@ public class GoogleMap : MonoBehaviour
 
     public void OnGPSWork()
     {
-        _isGPSOn = true;
-        _marker.rectTransform.anchoredPosition = _markerInitPos;
+        //_isGPSOn = true;
+        //_marker.rectTransform.anchoredPosition = _markerInitPos;
+        //PointerEventData eventDataCurrentPosition = new PointerEventData(EventSystem.current);
+        //eventDataCurrentPosition.pointerId = Input.GetTouch(0).fingerId;
+        //OnPointerClick(eventDataCurrentPosition);
     }
 
     public void OnSetOnDestination()
@@ -465,5 +481,36 @@ public class GoogleMap : MonoBehaviour
         EventSystem.current.RaycastAll(eventDataCurrentPosition, results);
 
         return results.Count > 0;
+    }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        if(eventData.button == PointerEventData.InputButton.Left)
+        {
+            Debug.Log("Left Button Clicked!");
+        }
+
+        // 클릭된 위치의 UI 요소를 가져옵니다.
+        GameObject clickedObject = eventData.pointerCurrentRaycast.gameObject;
+        
+        if(clickedObject != null)
+        {
+            // 클릭된 UI 요소가 버튼인지 확인합니다.
+            Button button = clickedObject.GetComponent<Button>();
+
+            if (button != null)
+            {
+                // 클릭된 UI 요소가 버튼인 경우에만 동작을 처리합니다.
+                Debug.Log("GPS Button Clicked!");
+                _isGPSOn = true;
+                _marker.rectTransform.anchoredPosition = _markerInitPos;
+                // 여기에 버튼을 클릭했을 때 실행할 동작을 추가합니다.
+            }
+            else
+            {
+                // 클릭된 UI 요소가 버튼이 아니라면 해당 클릭 이벤트를 무시합니다.
+                eventData.Use(); // 이벤트를 소비하여 다른 요소가 처리하지 못하도록 합니다.
+            }
+        }
     }
 }
