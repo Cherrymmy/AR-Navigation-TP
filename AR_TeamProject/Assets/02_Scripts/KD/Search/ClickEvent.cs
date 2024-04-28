@@ -1,7 +1,7 @@
 using TMPro;
 using UnityEngine;
 
-namespace Search
+namespace AR
 {
     public class CilckEvent : MonoBehaviour
     {
@@ -22,8 +22,8 @@ namespace Search
         public void DeletePlace()
         {
             TMP_Text tmpText = GetComponentInChildren<TMP_Text>();
-            DataManager.Instance.RemovePlaceIdData(tmpText.text); // JSONø°º≠ µ•¿Ã≈Õ ªË¡¶
-            Destroy(gameObject); // «¡∏Æ∆’ ¡¶∞≈
+            DataManager.Instance.RemovePlaceIdData(tmpText.text); // JSONÏóêÏÑú Îç∞Ïù¥ÌÑ∞ ÏÇ≠Ï†ú
+            Destroy(gameObject); // ÌîÑÎ¶¨Ìåπ Ï†úÍ±∞
         }
     }
 

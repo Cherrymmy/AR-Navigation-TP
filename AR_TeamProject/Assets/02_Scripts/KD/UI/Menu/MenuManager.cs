@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Reflection;
 
 namespace UnityEngine.UI.Extensions
@@ -29,7 +29,7 @@ namespace UnityEngine.UI.Extensions
         // 메뉴를 LIFO (후입선출) 순서로 관리하기 위해 사용되는 스택입니다.
         private Stack<Menu> menuStack = new Stack<Menu>();
 
-        public static MenuManager Instance { get; set; } // MenuManager의 싱글톤 인스턴스입니다.
+        public static MenuManager Instance { get; set; } 
 
         private void Start()
         {

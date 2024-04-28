@@ -1,6 +1,6 @@
 using System.Collections;
 
-namespace Search
+namespace AR
 {
     public interface IJsonDataManager
     {
