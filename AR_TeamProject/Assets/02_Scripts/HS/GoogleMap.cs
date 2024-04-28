@@ -68,13 +68,15 @@ public class GoogleMap : MonoBehaviour
     private bool _isGPSButtonClick;
     
     private float _zoomSpeed = 0.005f;
+    private int _minZoom = 8;
+    private int _maxZoom = 20;
     public float DragSpeed 
     { 
         get => _dragSpeed; 
         set => _dragSpeed = value; 
     }
-    [SerializeField] private float _dragSpeed = 0.000085f;
 
+    [SerializeField] private float _dragSpeed = 0.000085f;
 
     private Vector2 _prevTouch1Pos;
     private Vector2 _prevTouch2Pos;
@@ -330,7 +332,7 @@ public class GoogleMap : MonoBehaviour
             float newZoom = _zoomLast - deltaMagnitudeDiff * _zoomSpeed;
             int newIntZoom = Mathf.RoundToInt(newZoom);
 
-            _zoom = Math.Clamp(newIntZoom, 0, 20);
+            _zoom = Math.Clamp(newIntZoom, _minZoom, _maxZoom);
 
             int zoomScale = _zoom - _zoomLast;
 
@@ -357,6 +359,9 @@ public class GoogleMap : MonoBehaviour
                 _isDraging = true;
                 _isGPSOn = false;
             }
+
+            Debug.Log("Zoom : " + _zoom);
+            Debug.Log("DragSpeed : " + _dragSpeed);
 
             Vector2 curTouchPos = Input.GetTouch(0).position;
 
@@ -390,27 +395,21 @@ public class GoogleMap : MonoBehaviour
 
     public void OnSetOnDestination()
     {
-        if (!EventSystem.current.IsPointerOverGameObject(Input.GetTouch(0).fingerId))
-        {
-            // 목적지 야당역 설정
-            _destinationLat = 37.71275f;
-            _destinationLon = 126.7615f;
+        // 목적지 야당역 설정
+        _destinationLat = 37.71275f;
+        _destinationLon = 126.7615f;
 
-            _dragInitGPSLat = _gpsLat;
-            _dragInitGPSLon = _gpsLon;
-        }
+        _dragInitGPSLat = _gpsLat;
+        _dragInitGPSLon = _gpsLon;
     }
 
     public void OnSetOffDestination()
     {
-        if (!EventSystem.current.IsPointerOverGameObject(Input.GetTouch(0).fingerId))
-        {
-            // 목적지 초기화
-            _destinationLat = 0f;
-            _destinationLon = 0f;
+        // 목적지 초기화
+        _destinationLat = 0f;
+        _destinationLon = 0f;
 
-            _dragInitGPSLat = 0f;
-            _dragInitGPSLon = 0f;
-        }
+        _dragInitGPSLat = 0f;
+        _dragInitGPSLon = 0f;
     }
 }
