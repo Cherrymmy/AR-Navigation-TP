@@ -840,7 +840,7 @@ PlayerSettings:
   webGLMemoryGeometricGrowthCap: 96
   webGLPowerPreference: 2
   scriptingDefineSymbols:
-    Android: ARCORE_INTERNAL_GEOSPATIAL_CREATOR_ENABLED
+    Android: ARCORE_INTERNAL_GEOSPATIAL_CREATOR_ENABLED;ARCORE_USE_ARF_5
     iPhone: ARCORE_INTERNAL_GEOSPATIAL_CREATOR_ENABLED
   additionalCompilerArguments: {}
   platformArchitecture: {}
