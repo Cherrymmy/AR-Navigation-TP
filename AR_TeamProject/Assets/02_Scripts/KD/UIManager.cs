@@ -5,14 +5,13 @@ public class UIManager : MonoBehaviour
 {
     /// <summary>
     /// _menuScreens의 배열순서 맞추기
-    /// 스테틱맵0, 검색1, 상세2, 경로3, 내비4, AR내비5
+    /// 스테틱맵0, 검색1, 상세2, 내비3, AR내비4
     /// </summary>
     public enum MenuType
     {
         StaticMap_Canvas,
         Search_Canvas,
         Detail_Canvas,
-        Direction_Canvas,
         NaviMap_Canvas,
         ARMap_Canvas
     }

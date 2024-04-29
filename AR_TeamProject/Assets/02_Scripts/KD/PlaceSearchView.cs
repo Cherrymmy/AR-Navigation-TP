@@ -3,44 +3,65 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
-
-public class PlaceSearchView : IUimenu
+using UnityEngine.Events;
+namespace AR
 {
-    [Tooltip("바꾸고 싶은 메뉴2")]
-    public UIManager.MenuType TargetMeun2Type;
-    [Space]
-    [Header("UI")]
-    [Tooltip("검색창")]
-    public TMP_InputField searchText;
-    [Tooltip("뒤로가기 버튼")]
-    public Button exitButton;
-
-    private void Start()
+    public class PlaceSearchView : IUimenu
     {
-        //searchText.onValueChanged.AddListener();
-        searchText.onSelect.AddListener(delegate { Open(); });
-        exitButton.onClick.AddListener(delegate { Close(); });
-    }
+        [Tooltip("바꾸고 싶은 메뉴2")]
+        public UIManager.MenuType TargetMeun2Type;
+        [Space]
+        [Header("UI")]
+        [Tooltip("검색창")]
+        public TMP_InputField searchText;
+        [Tooltip("뒤로가기 버튼")]
+        public Button exitButton;
 
-    public override void Close()
-    {
-        TargetSwitch2Meun();
-    }
+        public UnityEvent OnReSearchCreate;
+        public UnityEvent OnSearchCreate;
 
-    public override void Open()
-    {
-        TargetSwitch();
-        UIManager.Instance.LoadingSet = false;
-    }
 
-    public override void TargetSwitch()
-    {
-        UIManager.Instance.Switch(MenuType, TargetMenuType);
-    }
+        public PlacesSearchController PSController;
 
-    public void TargetSwitch2Meun()
-    {
-        UIManager.Instance.Switch(MenuType, TargetMeun2Type);
-        UIManager.Instance.LoadingSet = false;
+
+        private void Start()
+        {
+            searchText.onValueChanged.AddListener(delegate { SearchListCreate(); });
+            searchText.onSelect.AddListener(delegate { ReSearchListCreate(); });
+            exitButton.onClick.AddListener(delegate { Close(); });
+        }
+
+        public override void Close()
+        {
+            TargetSwitch2Meun();
+        }
+
+        public override void Open()
+        {
+            TargetSwitch();
+            UIManager.Instance.LoadingSet = false;
+        }
+
+        public override void TargetSwitch()
+        {
+            UIManager.Instance.Switch(MenuType, TargetMenuType);
+        }
+
+        public void TargetSwitch2Meun()
+        {
+            UIManager.Instance.Switch(MenuType, TargetMeun2Type);
+            UIManager.Instance.LoadingSet = false;
+        }
+
+        public void ReSearchListCreate()
+        {
+            OnReSearchCreate.Invoke();
+        }
+
+        public void SearchListCreate()
+        {
+            OnSearchCreate.Invoke();
+        }
     }
 }
+
