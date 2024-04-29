@@ -7,14 +7,14 @@ using UnityEngine.UI;
 public class GPS : MonoBehaviour
 {
 
-    //ÅØ½ºÆ® uiº¯¼ö
+    //í…ìŠ¤íŠ¸ uië³€ìˆ˜
     public static GPS instance;
     public Text latitude_text;
     public Text longitude_text;
     public float maxWaitTime = 10.0f;
     public float resendTime = 0.016f;
 
-    //À§µµ °æµµ º¯°æ
+    //ìœ„ë„ ê²½ë„ ë³€ê²½
     public float latitude = 0;
     public float longitude = 0;
     float waitTime = 0;
@@ -40,20 +40,25 @@ public class GPS : MonoBehaviour
         StartCoroutine(GPS_On());
     }
 
-    //GPSÃ³¸® ÇÔ¼ö
+    //GPSì²˜ë¦¬ í•¨ìˆ˜
     public IEnumerator GPS_On()
     {
-        //¸¸ÀÏ,GPS»ç¿ë Çã°¡¸¦ ¹ŞÁö ¸øÇß´Ù¸é, ±ÇÇÑ Çã°¡ ÆË¾÷À» ¶ç¿ò
+        //ë§Œì¼,GPSì‚¬ìš© í—ˆê°€ë¥¼ ë°›ì§€ ëª»í–ˆë‹¤ë©´, ê¶Œí•œ í—ˆê°€ íŒì—…ì„ ë„ì›€
         if (!Permission.HasUserAuthorizedPermission(Permission.FineLocation))
         {
             Permission.RequestUserPermission(Permission.FineLocation);
-            while (!Permission.HasUserAuthorizedPermission(Permission.FineLocation))
+
+            if (!Permission.HasUserAuthorizedPermission(Permission.FineLocation))
             {
-                yield return null;
+#if UNITY_ANDROID
+                OpenAppSettings();
+#endif
+                // ê¶Œí•œ ê±°ë¶€ë¨
+                Application.Quit();
             }
         }
 
-        //¸¸ÀÏ GPS ÀåÄ¡°¡ ÄÑÁ® ÀÖÁö ¾ÊÀ¸¸é À§Ä¡ Á¤º¸¸¦ ¼ö½ÅÇÒ ¼ö ¾ø´Ù°í Ç¥½Ã
+        //ë§Œì¼ GPS ì¥ì¹˜ê°€ ì¼œì ¸ ìˆì§€ ì•Šìœ¼ë©´ ìœ„ì¹˜ ì •ë³´ë¥¼ ìˆ˜ì‹ í•  ìˆ˜ ì—†ë‹¤ê³  í‘œì‹œ
         if (!Input.location.isEnabledByUser)
         {
             latitude_text.text = "GPS Off";
@@ -61,52 +66,74 @@ public class GPS : MonoBehaviour
             yield break;
         }
 
-        //À§Ä¡ µ¥ÀÌÅÍ¸¦ ¿äÃ» -> ¼ö½Å ´ë±â
+        //ìœ„ì¹˜ ë°ì´í„°ë¥¼ ìš”ì²­ -> ìˆ˜ì‹  ëŒ€ê¸°
         Input.location.Start();
 
-        //GPS ¼ö½Å »óÅÂ°¡ ÃÊ±â »óÅÂ¿¡¼­ ÀÏÁ¤ ½Ã°£ µ¿¾È ´ë±âÇÔ
+        //GPS ìˆ˜ì‹  ìƒíƒœê°€ ì´ˆê¸° ìƒíƒœì—ì„œ ì¼ì • ì‹œê°„ ë™ì•ˆ ëŒ€ê¸°í•¨
         while (Input.location.status == LocationServiceStatus.Initializing && waitTime < maxWaitTime)
         {
             yield return new WaitForSeconds(1.0f);
             waitTime++;
         }
 
-        //¼ö½Å ½ÇÆĞ ½Ã ¼ö½ÅÀÌ ½ÇÆĞµÆ´Ù´Â °ÍÀ» Ãâ·Â
+        //ìˆ˜ì‹  ì‹¤íŒ¨ ì‹œ ìˆ˜ì‹ ì´ ì‹¤íŒ¨ëë‹¤ëŠ” ê²ƒì„ ì¶œë ¥
         if (Input.location.status == LocationServiceStatus.Failed)
         {
-            latitude_text.text = "À§Ä¡ Á¤º¸ ¼ö½Å ½ÇÆĞ";
-            longitude_text.text = "À§Ä¡ Á¤º¸ ¼ö½Å ½ÇÆĞ";
+            latitude_text.text = "ìœ„ì¹˜ ì •ë³´ ìˆ˜ì‹  ì‹¤íŒ¨";
+            longitude_text.text = "ìœ„ì¹˜ ì •ë³´ ìˆ˜ì‹  ì‹¤íŒ¨";
         }
 
-        //ÀÀ´ä ´ë±â ½Ã°£À» ³Ñ¾î°¡µµ·Ï ¼ö½ÅÀÌ ¾ø¾ú´Ù¸é ½Ã°£ ÃÊ°úµÆÀ½À» Ãâ·Â
+        //ì‘ë‹µ ëŒ€ê¸° ì‹œê°„ì„ ë„˜ì–´ê°€ë„ë¡ ìˆ˜ì‹ ì´ ì—†ì—ˆë‹¤ë©´ ì‹œê°„ ì´ˆê³¼ëìŒì„ ì¶œë ¥
         if (waitTime >= maxWaitTime)
         {
-            latitude_text.text = "ÀÀ´ä ´ë±â ½Ã°£ ÃÊ°ú";
-            longitude_text.text = "ÀÀ´ä ´ë±â ½Ã°£ ÃÊ°ú";
+            latitude_text.text = "ì‘ë‹µ ëŒ€ê¸° ì‹œê°„ ì´ˆê³¼";
+            longitude_text.text = "ì‘ë‹µ ëŒ€ê¸° ì‹œê°„ ì´ˆê³¼";
         }
 
-        //¼ö½ÅµÈ GPS µ¥ÀÌÅÍ¸¦ È­¸é¿¡ Ãâ·Â/
+        //ìˆ˜ì‹ ëœ GPS ë°ì´í„°ë¥¼ í™”ë©´ì— ì¶œë ¥/
 
         LocationInfo li = Input.location.lastData;
         /*latitude = li.latitude;
        longitude = li.longitude;
-       latitude_text.text = "À§µµ : " + latitude.ToString();
-       longitude_text.text = "°æµµ : " + longitude.ToString();
+       latitude_text.text = "ìœ„ë„ : " + latitude.ToString();
+       longitude_text.text = "ê²½ë„ : " + longitude.ToString();
        */
-        //À§Ä¡ Á¤º¸ ¼ö½Å ½ÃÀÛ Ã¼Å©
+        //ìœ„ì¹˜ ì •ë³´ ìˆ˜ì‹  ì‹œì‘ ì²´í¬
         receiveGPS = true;
 
-        //À§Ä¡ µ¥ÀÌÅÍ ¼ö½Å ½ÃÀÛ ÀÌÈÄ resendTime °æ°ú¸¶´Ù À§Ä¡ Á¤º¸¸¦ °»½ÅÇÏ°í Ãâ·Â
+        //ìœ„ì¹˜ ë°ì´í„° ìˆ˜ì‹  ì‹œì‘ ì´í›„ resendTime ê²½ê³¼ë§ˆë‹¤ ìœ„ì¹˜ ì •ë³´ë¥¼ ê°±ì‹ í•˜ê³  ì¶œë ¥
         while (receiveGPS)
         {
             li = Input.location.lastData;
             latitude = li.latitude;
             longitude = li.longitude;
 
-            latitude_text.text = "À§µµ : " + latitude.ToString();
-            longitude_text.text = "°æµµ : " + longitude.ToString();
+            latitude_text.text = "ìœ„ë„ : " + latitude.ToString();
+            longitude_text.text = "ê²½ë„ : " + longitude.ToString();
             _uiPos = GPSEncoder.GPSToUCS(latitude, longitude);
             yield return new WaitForSeconds(resendTime);
         }
     }
+#if UNITY_ANDROID
+    void OpenAppSettings()
+    {
+        // ì„¤ì • í™”ë©´ìœ¼ë¡œ ìœ ë„í•˜ëŠ” ëŒ€í™”ìƒì í‘œì‹œ
+        if (!Permission.HasUserAuthorizedPermission(Permission.FineLocation))
+        {
+            AndroidJavaClass unityClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+            AndroidJavaObject currentActivity = unityClass.GetStatic<AndroidJavaObject>("currentActivity");
+            AndroidJavaObject packageManager = currentActivity.Call<AndroidJavaObject>("getPackageManager");
+            AndroidJavaObject launchIntent = packageManager.Call<AndroidJavaObject>("getLaunchIntentForPackage", Application.identifier);
+            currentActivity.Call("startActivity", launchIntent);
+
+            AndroidJavaClass uriClass = new AndroidJavaClass("android.net.Uri");
+            AndroidJavaObject uriObject = uriClass.CallStatic<AndroidJavaObject>("fromParts", "package", Application.identifier, null);
+            AndroidJavaObject intentObject = new AndroidJavaObject("android.content.Intent", "android.settings.APPLICATION_DETAILS_SETTINGS", uriObject);
+
+            intentObject.Call<AndroidJavaObject>("addCategory", "android.intent.category.DEFAULT");
+            intentObject.Call<AndroidJavaObject>("setFlags", 0x10000000);
+            currentActivity.Call("startActivity", intentObject);
+        }
+    }
+#endif
 }

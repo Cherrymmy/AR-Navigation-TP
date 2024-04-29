@@ -22,10 +22,6 @@ namespace AR.Models
 
         string _apiKey = "AIzaSyCsyqqXiR26jn_xlk5UTmDdKdKqLoHyw1U";
 
-        private void Start()
-        {
-        }
-
         #region api 요청
         public void SearchPlaces(string query)
         {
@@ -60,7 +56,6 @@ namespace AR.Models
         private void ParseData(string jsonData)
         {
             PlacesData = JsonConvert.DeserializeObject<PlacesResponse>(jsonData);
-            OnDataParsed.Invoke();  // 데이터 파싱 완료 이벤트 발생
         }
 
         private void DestroyData()
@@ -81,6 +76,7 @@ namespace AR.Models
             DataManager.Instance.RemovePlaceIdData(name);
         }
         #endregion
+
     }
 
     [System.Serializable]
