@@ -105,6 +105,7 @@ public class GoogleMap : MonoBehaviour
     // Destination
     private float _destinationLat;
     private float _destinationLon;
+    //private string _destinationPos;
 
     public enum GoogleMapColor
     {
@@ -401,6 +402,10 @@ public class GoogleMap : MonoBehaviour
 
         _dragInitGPSLat = _gpsLat;
         _dragInitGPSLon = _gpsLon;
+
+        // 마커 위치를 목적지에 설정
+        //_markerLat = 37.71275f;
+        //_markerLon = 126.7615f;
     }
 
     public void OnSetOffDestination()
@@ -411,5 +416,10 @@ public class GoogleMap : MonoBehaviour
 
         _dragInitGPSLat = 0f;
         _dragInitGPSLon = 0f;
+    }
+
+    public void OnSearchButton()
+    {
+        //_destinationPos = "&markers=" + "color:" + GoogleMapColor.purple + "|" + _markerLat + "," + _markerLon;
     }
 }
