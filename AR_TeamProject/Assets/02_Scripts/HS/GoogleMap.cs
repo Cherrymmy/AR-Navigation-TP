@@ -105,7 +105,10 @@ public class GoogleMap : MonoBehaviour
     // Destination
     private float _destinationLat;
     private float _destinationLon;
-    //private string _destinationPos;
+
+    // Canvas
+    private Canvas _staticMapCanvas;
+    private bool _isSetDestination;
 
     public enum GoogleMapColor
     {
@@ -125,6 +128,7 @@ public class GoogleMap : MonoBehaviour
     {
         GPSManager = GameObject.Find("GPSManager");
         _marker = transform.Find("Image - Marker").GetComponent<Image>();
+        _staticMapCanvas = GetComponentInParent<Canvas>();
         _markerInitPos = _marker.rectTransform.anchoredPosition;
 
         StartCoroutine(GetGoogleMap());
@@ -142,8 +146,16 @@ public class GoogleMap : MonoBehaviour
                 _gpsLat = GPSManager.GetComponent<GPS>().latitude;
                 _gpsLon = GPSManager.GetComponent<GPS>().longitude;
 
-                _markerLat = _gpsLat;
-                _markerLon = _gpsLon;
+                if(!_isSetDestination)
+                {
+                    _markerLat = _gpsLat;
+                    _markerLon = _gpsLon;
+                }
+                else
+                {
+                    _gpsLat = _markerLat;
+                    _gpsLon = _markerLon;
+                }
 
                 // gps가 초기화 되기 전에 막기 위한 변수
                 // gpsLat, gpsLon이 0, 0 이면 true를 반환
@@ -421,5 +433,21 @@ public class GoogleMap : MonoBehaviour
     public void OnSearchButton()
     {
         //_destinationPos = "&markers=" + "color:" + GoogleMapColor.purple + "|" + _markerLat + "," + _markerLon;
+        //_staticMapCanvas.enabled = false;
+
+        _isSetDestination = true;
+        _markerLat = 37.71275f;
+        _markerLon = 126.7615f;
+    }
+
+    public void OnCloseButton()
+    {
+        //_destinationPos = "&markers=" + "color:" + GoogleMapColor.purple + "|" + _markerLat + "," + _markerLon;
+        _staticMapCanvas.enabled = false;
+    }
+
+    public void OntestButton()
+    {
+        _staticMapCanvas.enabled = true;
     }
 }
