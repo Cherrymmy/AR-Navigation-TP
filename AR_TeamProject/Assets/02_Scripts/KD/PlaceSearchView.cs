@@ -17,17 +17,20 @@ namespace AR
         [Tooltip("뒤로가기 버튼")]
         public Button exitButton;
 
-        public UnityEvent OnReSearchCreate;
-        public UnityEvent OnSearchCreate;
+        public UnityEvent OnInputFieldSelect;
+        public UnityEvent OnInputFieldChange;
 
-
-        public PlacesSearchController PSController;
-
+        private PlacesSearchController PSController;          
 
         private void Start()
         {
-            searchText.onValueChanged.AddListener(delegate { SearchListCreate(); });
+            PSController = FindAnyObjectByType<PlacesSearchController>();
+        //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+        //  인풋 필드
+            searchText.onValueChanged.AddListener(delegate { SearchListCreate();});
             searchText.onSelect.AddListener(delegate { ReSearchListCreate(); });
+        //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+        //  뒤로 가기 버튼
             exitButton.onClick.AddListener(delegate { Close(); });
         }
 
@@ -55,13 +58,16 @@ namespace AR
 
         public void ReSearchListCreate()
         {
-            OnReSearchCreate.Invoke();
+            OnInputFieldSelect.Invoke();
         }
 
         public void SearchListCreate()
         {
-            OnSearchCreate.Invoke();
+            
+            OnInputFieldChange.Invoke();
         }
+
+        
     }
 }
 

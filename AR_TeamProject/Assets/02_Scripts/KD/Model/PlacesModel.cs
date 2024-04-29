@@ -7,6 +7,8 @@ using UnityEngine.Events;
 using TMPro;
 using System.Collections.Generic;
 using UnityEngine.UI;
+using static AR.DataManager;
+using UnityEditor.Search;
 
 
 ///데이터를 로드, 저장, 수정하는 로직을 처리합니다.
@@ -14,14 +16,19 @@ namespace AR.Models
 {
     public class PlacesModel : MonoBehaviour
     {
-        public PlacesResponse PlacesData { get; private set; } // 파싱된 데이터 저장
+        public PlacesResponse PlacesData { get; private set ; } // 파싱된 데이터 저장
+        public PlacesDatas jsonDatas { get; private set; }
 
         public UnityEvent<string> OnDataReceived;
         public UnityEvent OnDataParsed;                         // 파싱된 데이터를 알리는 이벤트
-        public UnityEvent OnDataUpdated;
-
+        public UnityEvent OnDataUpdated;                        // 이전 검색기록 호출
         string _apiKey = "AIzaSyCsyqqXiR26jn_xlk5UTmDdKdKqLoHyw1U";
 
+
+        private void Start()
+        {
+         
+        }
         #region api 요청
         public void SearchPlaces(string query)
         {
@@ -45,38 +52,29 @@ namespace AR.Models
                 else
                 {
                     string response = webRequest.downloadHandler.text;
-                    OnDataReceived.Invoke(response); // ??? 이거 데이터 수신 성공 이벤트 발생
-                    DestroyData();
                     ParseData(response);
+                    OnDataParsed.Invoke();                                              // 서치 완료
                 }
             }
         }
         #endregion
+
         #region search data 저장
         private void ParseData(string jsonData)
         {
             PlacesData = JsonConvert.DeserializeObject<PlacesResponse>(jsonData);
         }
 
-        private void DestroyData()
-        {
-            if (PlacesData != null && PlacesData.results != null)
-            {
-                PlacesData.results = new PlaceResult[0]; 
-            }
-        }
-
         public void SaveData(string name,string place_id)
         {
-            DataManager.Instance.AddPlaceIdData(name, place_id);
+            Instance.AddPlaceIdData(name, place_id);
         }
 
         public void LoadDataDelete(string name)
         {
-            DataManager.Instance.RemovePlaceIdData(name);
+            Instance.RemovePlaceIdData(name);
         }
         #endregion
-
     }
 
     [System.Serializable]

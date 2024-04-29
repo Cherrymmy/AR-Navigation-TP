@@ -107,4 +107,6 @@ public class UIManager : MonoBehaviour
         lodingPopUpSceen?.SetActive(false);
         SwapMenuScreens(currentIndex, targetIndex);
     }
+
+    
 }

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEditor.Search;
 
 namespace AR
 {
@@ -16,8 +17,8 @@ namespace AR
         [Tooltip("처음에 만들 갯수")]
         public int poolSize = 15;
 
-        private Queue<GameObject> _searchListPool = new Queue<GameObject>();
-        private Queue<GameObject> _reSearchListPool = new Queue<GameObject>();
+        private List<GameObject> _searchListPool = new List<GameObject>();
+        public List<GameObject> _reSearchListPool = new List<GameObject>();
         private static ObjectPool _instance;
 
 
@@ -42,17 +43,18 @@ namespace AR
         {
             for (int i = 0; i < poolSize; i++)
             {
-                GameObject searchList = Instantiate(uiPrefab[0], uiParent.transform);
-                searchList.SetActive(false);
-                _searchListPool.Enqueue(searchList);
+                GameObject reSearchList = Instantiate(uiPrefab[1], uiParent.transform);
+                reSearchList.SetActive(false);
+                _reSearchListPool.Add(reSearchList);
+                Debug.Log(_reSearchListPool.Count);
+
             }
 
             for (int i = 0; i < poolSize; i++)
             {
-                GameObject reSearchList = Instantiate(uiPrefab[1], uiParent.transform);
-                reSearchList.SetActive(false);
-                _reSearchListPool.Enqueue(reSearchList);
-
+                GameObject searchList = Instantiate(uiPrefab[0], uiParent.transform);
+                searchList.SetActive(false);
+                _searchListPool.Add(searchList);
             }
         }
 
@@ -63,15 +65,17 @@ namespace AR
         /// <returns></returns>
         public GameObject GetSearchListElement(string name)
         {
-            if (_searchListPool.Count > 0)
+            foreach (GameObject obj in _searchListPool)
             {
-                GameObject uiObject = _searchListPool.Dequeue();
-                TMP_Text listname = uiObject.GetComponentInChildren<TMP_Text>();
-                listname.text = name;
-                uiObject.SetActive(true);
-                return uiObject;
+                if (!obj.activeInHierarchy)
+                {
+                    TMP_Text listname = obj.GetComponentInChildren<TMP_Text>();
+                    listname.text = name;
+                    obj.SetActive(true);
+                    return obj;
+                }
             }
-            return null; // 풀이 비어있으면 null 반환
+            return null; // All items are in use
         }
         /// <summary>
         /// 이전 검색 기록
@@ -80,27 +84,49 @@ namespace AR
         /// <returns></returns>
         public GameObject GetReSearchListElement(string name)
         {
-            if (_reSearchListPool.Count > 0)
+            foreach (GameObject obj in _reSearchListPool)
             {
-                GameObject uiObject = _reSearchListPool.Dequeue();
-                TMP_Text listname = uiObject.GetComponentInChildren<TMP_Text>();
-                listname.text = name;
-                uiObject.SetActive(true);
-                return uiObject;
+                if (!obj.activeInHierarchy)
+                {
+                    TMP_Text listname = obj.GetComponentInChildren<TMP_Text>();
+                    listname.text = name;
+                    obj.SetActive(true);
+                    return obj;
+                }
             }
-            return null; // 풀이 비어있으면 null 반환
+            return null; // All items are in use
         }
 
-        public void ReturnSearchListElement(GameObject uiObject)
+        public void ReturnSearchListElement(GameObject uiElement)
         {
-            uiObject.SetActive(false);
-            _searchListPool.Enqueue(uiObject);
+            uiElement.SetActive(false);
         }
 
-        public void ReturnReSearchListElement(GameObject uiObject)
+        public void ReturnReSearchListElement(GameObject uiElement)
         {
-            uiObject.SetActive(false);
-            _reSearchListPool.Enqueue(uiObject);
+            uiElement.SetActive(false);
+        }
+
+        public void ClearSearchResults()
+        {
+            foreach (var uiElement in _searchListPool)
+            {
+                if (uiElement.activeInHierarchy)
+                {
+                    ReturnSearchListElement(uiElement);
+                }
+            }
+        }
+
+        public void ClearReSearchResults()
+        {
+            foreach (var uiElement in _reSearchListPool)
+            {
+                if (uiElement.activeInHierarchy)
+                {
+                    ReturnReSearchListElement(uiElement);
+                }
+            }
         }
     }
 }
