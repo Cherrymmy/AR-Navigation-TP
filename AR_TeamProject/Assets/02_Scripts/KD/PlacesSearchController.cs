@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using static AR.ObjectPool;
 
 namespace AR
 {
@@ -39,16 +40,13 @@ namespace AR
         private void ReSearchCreate()
         {
 
-            Debug.Log("이전 검색기록");
             ReSearchClear();
-            //SearchClear();
             var placesDatas = DataManager.Instance.jsonDatas.datas;
             foreach (var place in placesDatas)
             {
-                Debug.Log("이전 검색기록 생성");
                 name = place.Name;
                 Debug.Log(name);
-                ObjectPool.Instance.GetReSearchListElement(name);
+                Instance.GetReSearchListElement(name);
             }
         }
 
@@ -63,21 +61,19 @@ namespace AR
             foreach (var place in list)
             {
                 name = place.name;
-                ObjectPool.Instance.GetSearchListElement(name);
+                Instance.GetSearchListElement(name);
             }
         }
 
         private void ReSearchClear()
         {
-            ObjectPool.Instance.ClearReSearchResults();
+            Instance.ClearReSearchResults();
 
         }
 
         private void SearchClear()
         {
-            ObjectPool.Instance.ClearSearchResults();
-
+            Instance.ClearSearchResults();
         }
-
     }
 }

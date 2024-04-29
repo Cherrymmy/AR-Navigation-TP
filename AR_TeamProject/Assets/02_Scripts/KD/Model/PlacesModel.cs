@@ -23,12 +23,8 @@ namespace AR.Models
         public UnityEvent OnDataParsed;                         // 파싱된 데이터를 알리는 이벤트
         public UnityEvent OnDataUpdated;                        // 이전 검색기록 호출
         string _apiKey = "AIzaSyCsyqqXiR26jn_xlk5UTmDdKdKqLoHyw1U";
+        
 
-
-        private void Start()
-        {
-         
-        }
         #region api 요청
         public void SearchPlaces(string query)
         {

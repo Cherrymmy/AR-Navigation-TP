@@ -66,8 +66,6 @@ namespace AR
             
             OnInputFieldChange.Invoke();
         }
-
-        
     }
 }
 
