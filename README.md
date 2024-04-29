@@ -1,5 +1,5 @@
 
-![header](https://capsule-render.vercel.app/api?text=AR_Navigation&animation=fadeIn)
+![header](https://capsule-render.vercel.app/api?type=Venom&color=auto&text=AR_Navigation&animation=fadeIn)
 
 # 메인 사진
 
@@ -19,27 +19,20 @@
     <th>박예원</th>
   </tr>
   <tr>
-    <td>사진</td>
-    <td>사진</td>
-    <td>사진</td>
-    <td>사진</td>
-    <td>사진</td>
-  </tr>
-  <tr>
     <td>
-       <a href="https://github.com/msgugu">@msgugu</a>  
+       <a href="https://github.com/blase148">@blase148</a>  
     </td>
     <td>
        <a href="https://github.com/msgugu">@msgugu</a>
     </td>
     <td>
-       <a href="https://github.com/msgugu">@msgugu</a>  
+       <a href="https://github.com/Cherrymmy">@Cherrymmy</a>  
     </td>
     <td>
-       <a href="https://github.com/msgugu">@msgugu</a>  
+       <a href="https://github.com/Hyungseokkk">@Hyungseokkk</a>  
     </td>
     <td>
-       <a href="https://github.com/msgugu">@msgugu</a>  
+       <a href="https://github.com/yewon4139">@yewon4139</a>  
     </td>
   </tr>
 </table>
