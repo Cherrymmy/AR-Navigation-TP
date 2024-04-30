@@ -8,21 +8,23 @@ using UnityEngine.Networking;
 using UnityEngine.UI;
 using UnityEngine.XR.ARFoundation;
 
-public class GoogleMap : MonoBehaviour
+public class GoogleMap : MonoBehaviour, ISubject
 {
     public string apiKey;       // 구글맵 api key
     public float lat = 0.0f;    // 위도
     public float lon = 0.0f;    // 경도
 
     public enum resolution { low = 0, high = 2 }    // 해상도
-    public resolution mapResolution = resolution.low;
+    public resolution MapResolution { get => _mapResolution; }
+    private resolution _mapResolution = resolution.low;
 
     public enum type { roadmap, satellite, hybrid, terrain }    // 맵 타입
-    public type maptype = type.roadmap;
+    public type MapType { get => _maptype; }
+    private type _maptype = type.roadmap;
 
     private string url = string.Empty;
-    private int mapWidth = 640;
-    private int mapHeight = 640;
+    private int _mapWidth = 640;
+    private int _mapHeight = 640;
     //private bool mapIsLoading = false;
     private Rect rect;
     private string apiKeyLast;
@@ -110,6 +112,10 @@ public class GoogleMap : MonoBehaviour
     private Canvas _staticMapCanvas;
     private bool _isSetDestination;
 
+    // ObserverPattern
+    private List<IStaticMapObserver> _staticMapObserver = new List<IStaticMapObserver>();
+    private List<IDirectionMapObserver> _directionMapObserver = new List<IDirectionMapObserver>();
+
     public enum GoogleMapColor
     {
         black,
@@ -127,14 +133,14 @@ public class GoogleMap : MonoBehaviour
     private void Start()
     {
         GPSManager = GameObject.Find("GPSManager");
-        _marker = transform.Find("Image - Marker").GetComponent<Image>();
-        _staticMapCanvas = GetComponentInParent<Canvas>();
-        _markerInitPos = _marker.rectTransform.anchoredPosition;
+        //_marker = transform.Find("Image - Marker").GetComponent<Image>();
+        _staticMapCanvas = GameObject.Find("Canvas - StaticMap")./*GetComponentInParent*/GetComponent<Canvas>();
+        //_markerInitPos = _marker.rectTransform.anchoredPosition;
 
-        StartCoroutine(GetGoogleMap());
-        rect = gameObject.GetComponent<RawImage>().rectTransform.rect;
-        mapWidth = (int)Math.Round(rect.width);
-        mapHeight = (int)Math.Round(rect.height);
+        //StartCoroutine(GetGoogleMap());
+        //rect = gameObject.GetComponent<RawImage>().rectTransform.rect;
+        //_mapWidth = (int)Math.Round(rect.width);
+        //_mapHeight = (int)Math.Round(rect.height);
     }
 
     private void FixedUpdate()
@@ -167,7 +173,7 @@ public class GoogleMap : MonoBehaviour
     private void Update()
     {
         if (updateMap && (apiKeyLast != apiKey || Mathf.Approximately(latLast, /*lat*/_gpsLat) || Mathf.Approximately(lonLast, /*lon*/_gpsLon) ||
-                        /*zoomLast != zoom ||*/ mapResolutionLast != mapResolution || mapTypeLast != maptype || !_isGPSWorked))
+                        /*zoomLast != zoom ||*/ mapResolutionLast != _mapResolution || mapTypeLast != _maptype || !_isGPSWorked))
         {
             // zoom in & out
             ZoomInAndOut();
@@ -175,18 +181,23 @@ public class GoogleMap : MonoBehaviour
             Draging();
 
             //Debug.Log("Update map start");
-            rect = gameObject.GetComponent<RawImage>().rectTransform.rect;
-            mapWidth = (int)Math.Round(rect.width);
-            mapHeight = (int)Math.Round(rect.height);
+            //rect = gameObject.GetComponent<RawImage>().rectTransform.rect;
+            //_mapWidth = (int)Math.Round(rect.width);
+            //_mapHeight = (int)Math.Round(rect.height);
 
             // 목적지가 설정되어 있지 않다면 static map 그리기
-            if (Mathf.Approximately(_destinationLat, 0f) && Mathf.Approximately(_destinationLon, 0f))
-                StartCoroutine(GetGoogleMap());
+            //if (Mathf.Approximately(_destinationLat, 0f) && Mathf.Approximately(_destinationLon, 0f))
+            //StartCoroutine(GetGoogleMap());
             // 목적지가 설정되어 있다면 경로 그리기
-            else
-                StartCoroutine(GetDirections());
+            //else
+            //StartCoroutine(GetDirections());
+            UpdateStaticMap();
 
-            updateMap = false;
+            latLast = _gpsLat;
+            lonLast = _gpsLon;
+            _zoomLast = _zoom;
+
+            //updateMap = false;
         }
     }
 
@@ -194,14 +205,14 @@ public class GoogleMap : MonoBehaviour
     {
         url = "https://maps.googleapis.com/maps/api/staticmap?center=" + /*lat*/_gpsLat + "," + /*lon */_gpsLon +
                                                                                 "&zoom=" + _zoom +
-                                                                                "&size=" + mapWidth +
-                                                                                "x" + mapHeight +
-                                                                                "&scale=" + mapResolution +
+                                                                                "&size=" + _mapWidth +
+                                                                                "x" + _mapHeight +
+                                                                                "&scale=" + _mapResolution +
                                                                                 "&markers=" + "color:" + GoogleMapColor.purple + "|" + _markerLat + "," + _markerLon +
-                                                                                "&maptype=" + maptype +
+                                                                                "&maptype=" + _maptype +
                                                                                 "&key=" + apiKey +
                                                                                 path; // 도보 + 대중교통 경로 추가
-
+        
 
         //mapIsLoading = true;
         UnityWebRequest www = UnityWebRequestTexture.GetTexture(url);
@@ -224,8 +235,8 @@ public class GoogleMap : MonoBehaviour
             latLast = _gpsLat;
             lonLast = _gpsLon;
             _zoomLast = _zoom;
-            mapResolutionLast = mapResolution;
-            mapTypeLast = maptype;
+            mapResolutionLast = _mapResolution;
+            mapTypeLast = _maptype;
             updateMap = true;
         }
 
@@ -385,7 +396,7 @@ public class GoogleMap : MonoBehaviour
             if (Mathf.Abs(horiziontalTouchDelta * _dragSpeed) > 0f)
             {
                 Vector2 newpos = new Vector2(-horiziontalTouchDelta, 0);
-                _marker.rectTransform.anchoredPosition += newpos;
+                //_marker.rectTransform.anchoredPosition += newpos;
                 _gpsLon = _gpsLon + horiziontalTouchDelta * _dragSpeed;
             }
 
@@ -393,7 +404,7 @@ public class GoogleMap : MonoBehaviour
             if (Mathf.Abs(verticalTouchDelta * _dragSpeed) > 0f)
             {
                 Vector2 newpos = new Vector2(0, -verticalTouchDelta);
-                _marker.rectTransform.anchoredPosition += newpos;
+                //_marker.rectTransform.anchoredPosition += newpos;
                 _gpsLat = _gpsLat + verticalTouchDelta * _dragSpeed;
             }
 
@@ -438,6 +449,7 @@ public class GoogleMap : MonoBehaviour
         _isSetDestination = true;
         _markerLat = 37.71275f;
         _markerLon = 126.7615f;
+        Debug.Log("Search Button Click");
     }
 
     public void OnCloseButton()
@@ -449,5 +461,56 @@ public class GoogleMap : MonoBehaviour
     public void OntestButton()
     {
         _staticMapCanvas.enabled = true;
+    }
+
+    public void ResisterStaticMapObserver(IStaticMapObserver observer)
+    {
+        _staticMapObserver.Add(observer);
+    }
+
+    public void ResisterDirectionMapObserver(IDirectionMapObserver observer)
+    {
+        _directionMapObserver.Add(observer);
+    }
+
+    public void RemoveStaticMapObserver(IStaticMapObserver observer)
+    {
+        _staticMapObserver.Remove(observer);
+    }
+
+    public void RemoveDirectionMapObserver(IDirectionMapObserver observer)
+    {
+        _directionMapObserver.Remove(observer);
+    }
+
+    public void NotifyStaticMapObservers()
+    {
+        foreach(IStaticMapObserver observer in _staticMapObserver)
+        {
+            //_gpsLat = 37.71369f;
+            //_gpsLon = 126.7436f;
+            //_zoom = 14;
+            observer.UpdateData(_gpsLat, _gpsLon, _zoom);
+        }
+    }
+
+    public void NotifyDirectionMapObservers()
+    {
+        foreach(IDirectionMapObserver observer in _directionMapObserver)
+        {
+            observer.UpdateData();
+        }
+    }
+
+    private void UpdateStaticMap()
+    {
+        // Update StaticMap Data
+        NotifyStaticMapObservers();
+    }
+
+    private void UpdateDirectionMap()
+    {
+        // Update DirectionMap Data
+        NotifyDirectionMapObservers();
     }
 }

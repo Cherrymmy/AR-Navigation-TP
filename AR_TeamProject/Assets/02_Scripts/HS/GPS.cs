@@ -12,19 +12,12 @@ public class GPS : MonoBehaviour
     public Text latitude_text;
     public Text longitude_text;
     public float maxWaitTime = 10.0f;
-    public float resendTime = 0.016f;
+    public float resendTime = 1f;
 
     //위도 경도 변경
     public float latitude = 0;
     public float longitude = 0;
     float waitTime = 0;
-
-    public Vector3 UIPos 
-    { 
-        get => _uiPos; 
-        set => _uiPos = value;
-    }
-    private Vector2 _uiPos;
 
     public bool receiveGPS = false;
 
@@ -110,7 +103,7 @@ public class GPS : MonoBehaviour
 
             latitude_text.text = "위도 : " + latitude.ToString();
             longitude_text.text = "경도 : " + longitude.ToString();
-            _uiPos = GPSEncoder.GPSToUCS(latitude, longitude);
+            
             yield return new WaitForSeconds(resendTime);
         }
     }
