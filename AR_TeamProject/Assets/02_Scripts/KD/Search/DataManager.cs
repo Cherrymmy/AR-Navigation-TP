@@ -21,6 +21,20 @@ namespace AR
         {
             public List<PlaceIdData> datas;
         }
+
+        [System.Serializable]
+        public class PlacesResponse
+        {
+            public PlaceResult[] results;
+        }
+
+        [System.Serializable]
+        public class PlaceResult
+        {
+            public string name;
+            public string place_id;
+        }
+
         public PlacesDatas jsonDatas { get; private set; }
 
 

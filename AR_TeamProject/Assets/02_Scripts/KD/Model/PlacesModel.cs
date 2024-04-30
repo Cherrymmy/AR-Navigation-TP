@@ -1,14 +1,9 @@
-using System;
 using UnityEngine;
 using System.Collections;
 using UnityEngine.Networking;
 using Newtonsoft.Json;
 using UnityEngine.Events;
-using TMPro;
-using System.Collections.Generic;
-using UnityEngine.UI;
 using static AR.DataManager;
-using UnityEditor.Search;
 
 
 ///데이터를 로드, 저장, 수정하는 로직을 처리합니다.
@@ -19,9 +14,7 @@ namespace AR.Models
         public PlacesResponse PlacesData { get; private set ; } // 파싱된 데이터 저장
         public PlacesDatas jsonDatas { get; private set; }
 
-        public UnityEvent<string> OnDataReceived;
         public UnityEvent OnDataParsed;                         // 파싱된 데이터를 알리는 이벤트
-        public UnityEvent OnDataUpdated;                        // 이전 검색기록 호출
         string _apiKey = "AIzaSyCsyqqXiR26jn_xlk5UTmDdKdKqLoHyw1U";
         
 
@@ -49,7 +42,7 @@ namespace AR.Models
                 {
                     string response = webRequest.downloadHandler.text;
                     ParseData(response);
-                    OnDataParsed.Invoke();                                              // 서치 완료
+                    OnDataParsed.Invoke();                              // 서치 완료 (PlaceSearchController)
                 }
             }
         }
@@ -71,18 +64,5 @@ namespace AR.Models
             Instance.RemovePlaceIdData(name);
         }
         #endregion
-    }
-
-    [System.Serializable]
-    public class PlacesResponse
-    {
-        public PlaceResult[] results;
-    }
-
-    [System.Serializable]
-    public class PlaceResult
-    {
-        public string name;
-        public string place_id;
     }
 }

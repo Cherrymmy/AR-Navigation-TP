@@ -1,12 +1,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.UI;
+using UnityEngine.Events;
 
 namespace AR
 {
     public class ObjectPool : MonoBehaviour
     {
-        public static ObjectPool Instance { get { return _instance; } }
+
         [Header("오브젝트 풀")]
         [Tooltip("생성될 UI프리팹")]
         public GameObject[] uiPrefab; // UI 프리팹
@@ -15,9 +17,18 @@ namespace AR
         [Tooltip("처음에 만들 갯수")]
         public int poolSize = 15;
 
-        private List<GameObject> _searchListPool = new List<GameObject>();
-        public List<GameObject> _reSearchListPool = new List<GameObject>();
+        public static ObjectPool Instance { get { return _instance; } }
         private static ObjectPool _instance;
+
+        /* ObjectPool List */
+        // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+        private List<GameObject> _searchListPool = new List<GameObject>();
+        private List<GameObject> _reSearchListPool = new List<GameObject>();
+        // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+        /* 이벤트 관리 */
+        // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+        public UnityEvent OnDetailView;
+        public UnityEvent OnListDestroy;
 
 
         private void Awake()
@@ -68,12 +79,18 @@ namespace AR
                 if (!obj.activeInHierarchy)
                 {
                     TMP_Text listname = obj.GetComponentInChildren<TMP_Text>();
+                    Button detailButton = obj.GetComponentInChildren<Button>();
                     listname.text = name;
+
+
+                    //detailButton.onClick.AddListener(() => OnDetailView()); 
+
+
                     obj.SetActive(true);
                     return obj;
                 }
             }
-            return null; // All items are in use
+            return null; 
         }
         /// <summary>
         /// 이전 검색 기록
@@ -87,12 +104,19 @@ namespace AR
                 if (!obj.activeInHierarchy)
                 {
                     TMP_Text listname = obj.GetComponentInChildren<TMP_Text>();
+                    Button detailButton = obj.GetComponentInChildren<Button>();
+                    Button DestroyButton = obj.GetComponentInChildren<Button>();
                     listname.text = name;
+
+
+                    //detailButton.onClick.AddListener(() => OnDetailView());
+                    //DestroyButton.onClick.AddListener(() => OnListDestroy());
+
                     obj.SetActive(true);
                     return obj;
                 }
             }
-            return null; // All items are in use
+            return null; 
         }
 
         public void ReturnSearchListElement(GameObject uiElement)
@@ -126,5 +150,7 @@ namespace AR
                 }
             }
         }
+
+        
     }
 }

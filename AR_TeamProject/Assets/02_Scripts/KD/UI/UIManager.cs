@@ -59,7 +59,6 @@ public class UIManager : MonoBehaviour
     void Start()
     {
         _transform = gameObject.transform;
-        // menuScreens 배열 초기화 로직이 필요합니다.
 
         // 초기 시작 켄버스 선택
         _menuScreens[(int)StartMenu].transform.position = _transform.position;
