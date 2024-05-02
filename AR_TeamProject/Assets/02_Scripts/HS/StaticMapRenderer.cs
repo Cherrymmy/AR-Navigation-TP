@@ -62,6 +62,10 @@ public class StaticMapRenderer : MonoBehaviour, IStaticMapObserver
 
     IEnumerator GetGoogleStaticMap()
     {
+        _rect = GetComponent<RawImage>().rectTransform.rect;
+        _mapWidth = (int)Math.Round(_rect.width);
+        _mapHeight = (int)Math.Round(_rect.height);
+
         _url = "https://maps.googleapis.com/maps/api/staticmap?center=" + _gpsLat + "," + _gpsLon +
                                                                                "&zoom=" + _zoom +
                                                                                "&size=" + _mapWidth + "x" + _mapHeight +

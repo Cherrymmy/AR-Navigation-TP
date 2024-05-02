@@ -152,16 +152,16 @@ public class GoogleMap : MonoBehaviour, ISubject
                 _gpsLat = GPSManager.GetComponent<GPS>().latitude;
                 _gpsLon = GPSManager.GetComponent<GPS>().longitude;
 
-                if(!_isSetDestination)
-                {
-                    _markerLat = _gpsLat;
-                    _markerLon = _gpsLon;
-                }
-                else
-                {
-                    _gpsLat = _markerLat;
-                    _gpsLon = _markerLon;
-                }
+                //if(!_isSetDestination)
+                //{
+                //    _markerLat = _gpsLat;
+                //    _markerLon = _gpsLon;
+                //}
+                //else
+                //{
+                //    _gpsLat = _markerLat;
+                //    _gpsLon = _markerLon;
+                //}
 
                 // gps가 초기화 되기 전에 막기 위한 변수
                 // gpsLat, gpsLon이 0, 0 이면 true를 반환
@@ -456,6 +456,11 @@ public class GoogleMap : MonoBehaviour, ISubject
     {
         //_destinationPos = "&markers=" + "color:" + GoogleMapColor.purple + "|" + _markerLat + "," + _markerLon;
         _staticMapCanvas.enabled = false;
+        //목적지 설정 및 캔버스 닫기
+        _gpsLat = 37.69399779f;
+        _gpsLon = 126.76111812f;
+        _isGPSOn = false;
+        Debug.Log("마커 위치 : " +  _gpsLat + ", " + _gpsLon);
     }
 
     public void OntestButton()

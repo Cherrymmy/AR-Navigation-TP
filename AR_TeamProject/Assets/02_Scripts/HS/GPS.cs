@@ -11,12 +11,14 @@ public class GPS : MonoBehaviour
     public static GPS instance;
     public Text latitude_text;
     public Text longitude_text;
+    public Text altitude_text;
     public float maxWaitTime = 10.0f;
     public float resendTime = 1f;
 
     //위도 경도 변경
     public float latitude = 0;
     public float longitude = 0;
+    public float altitude = 0;
     float waitTime = 0;
 
     public bool receiveGPS = false;
@@ -56,6 +58,7 @@ public class GPS : MonoBehaviour
         {
             latitude_text.text = "GPS Off";
             longitude_text.text = "GPS Off";
+            altitude_text.text = "GPS Off";
             yield break;
         }
 
@@ -100,10 +103,12 @@ public class GPS : MonoBehaviour
             li = Input.location.lastData;
             latitude = li.latitude;
             longitude = li.longitude;
+            altitude = li.altitude;
 
             latitude_text.text = "위도 : " + latitude.ToString();
             longitude_text.text = "경도 : " + longitude.ToString();
-            
+            altitude_text.text = "고도 : " + altitude.ToString();
+
             yield return new WaitForSeconds(resendTime);
         }
     }
