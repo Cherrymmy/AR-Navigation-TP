@@ -50,12 +50,12 @@ namespace AR
 
         public override void TargetSwitch()
         {
-            UIManager.Instance.Switch(MenuType, TargetMenuType);
+            UIManager.Instance.Switch(CurrentMenu, TargetMenuType);
         }
 
         public void TargetSwitch2Meun()
         {
-            UIManager.Instance.Switch(MenuType, TargetMeun2Type);
+            UIManager.Instance.Switch(CurrentMenu, TargetMeun2Type);
             UIManager.Instance.LoadingSet = false;
         }
 

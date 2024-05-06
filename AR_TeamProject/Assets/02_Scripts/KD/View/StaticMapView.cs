@@ -27,7 +27,7 @@ public class StaticMapView : IUimenu
 
     public override void TargetSwitch()
     {
-        UIManager.Instance.Switch(MenuType, TargetMenuType);
+        UIManager.Instance.Switch(CurrentMenu, TargetMenuType);
         UIManager.Instance.LoadingSet = false;
     }
 }

@@ -1512,12 +1512,6 @@ MonoBehaviour:
   - {fileID: 4031862019473697388, guid: 50ad39d5f7ac8b94992723ee875669fe, type: 3}
   uiParent: {fileID: 1552884293}
   poolSize: 15
-  OnDetailView:
-    m_PersistentCalls:
-      m_Calls: []
-  OnListDestroy:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!4 &748004096
 Transform:
   m_ObjectHideFlags: 0
@@ -2450,7 +2444,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0cf20e81307c38439334aa156c558c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MenuType: 2
+  CurrentMenu: 0
   TargetMenuType: 3
   TargetMeun2Type: 1
   exitButton: {fileID: 924096088}
@@ -2651,7 +2645,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 04390a83dfd02ad4388cc2e10ab2c115, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MenuType: 1
+  CurrentMenu: 1
   TargetMenuType: 2
   TargetMeun2Type: 0
   searchText: {fileID: 1790592843}
@@ -4568,7 +4562,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d64d89080efd4fc4baf8dcf8c5f515a6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MenuType: 0
+  CurrentMenu: 0
   TargetMenuType: 1
   joinButton: {fileID: 1247277186}
 --- !u!224 &2028849246 stripped

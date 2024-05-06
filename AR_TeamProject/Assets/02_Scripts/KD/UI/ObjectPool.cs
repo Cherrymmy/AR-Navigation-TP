@@ -3,6 +3,7 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 using UnityEngine.Events;
+using AR.Models;
 
 namespace AR
 {
@@ -20,15 +21,18 @@ namespace AR
         public static ObjectPool Instance { get { return _instance; } }
         private static ObjectPool _instance;
 
+        // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+        private PlacesModel _placesModel;
+
         /* ObjectPool List */
         // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         private List<GameObject> _searchListPool = new List<GameObject>();
         private List<GameObject> _reSearchListPool = new List<GameObject>();
         // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
         /* 이벤트 관리 */
         // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-        public UnityEvent OnDetailView;
-        public UnityEvent OnListDestroy;
+
 
 
         private void Awake()
@@ -45,6 +49,7 @@ namespace AR
 
         private void Start()
         {
+            _placesModel = FindAnyObjectByType<PlacesModel>();
             InitializePool();
         }
 
@@ -82,9 +87,7 @@ namespace AR
                     Button detailButton = obj.GetComponentInChildren<Button>();
                     listname.text = name;
 
-
-                    //detailButton.onClick.AddListener(() => OnDetailView()); 
-
+                    detailButton.onClick.AddListener(() => _placesModel.OnClickDetailView(name)); 
 
                     obj.SetActive(true);
                     return obj;
@@ -104,13 +107,14 @@ namespace AR
                 if (!obj.activeInHierarchy)
                 {
                     TMP_Text listname = obj.GetComponentInChildren<TMP_Text>();
-                    Button detailButton = obj.GetComponentInChildren<Button>();
-                    Button DestroyButton = obj.GetComponentInChildren<Button>();
+                    Button[] Button = obj.GetComponentsInChildren<Button>();  
+
                     listname.text = name;
 
-
-                    //detailButton.onClick.AddListener(() => OnDetailView());
-                    //DestroyButton.onClick.AddListener(() => OnListDestroy());
+                    // DetailButton
+                    Button[0].onClick.AddListener(() => _placesModel.OnClickDetailView(name));
+                    // DstroyButton
+                    Button[1].onClick.AddListener(delegate { _placesModel.OnClickListDestroy(name); ReturnReSearchListElement(obj); });
 
                     obj.SetActive(true);
                     return obj;

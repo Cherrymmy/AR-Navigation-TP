@@ -13,19 +13,15 @@ namespace AR
         string apiKey = "AIzaSyCsyqqXiR26jn_xlk5UTmDdKdKqLoHyw1U";
         public PlacesResponse jsonResponse;
 
-        private PlacesSearchController _PSController;
 
         private void Start()
         {
-            _PSController = FindAnyObjectByType<PlacesSearchController>();
-            // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-            _PSController.onDetailSearch.AddListener(Toss) ;
-            // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
         }
 
-        public void Toss()
+        public void Toss(string name)
         {
-            //Details();
+            Details(name);
         }
        
         private void Details(string name)

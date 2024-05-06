@@ -11,12 +11,17 @@ namespace AR.Models
 {
     public class PlacesModel : MonoBehaviour
     {
-        public PlacesResponse PlacesData { get; private set ; } // 파싱된 데이터 저장
+        public PlacesResponse PlacesData { get; set ; } // 파싱된 데이터 저장
         public PlacesDatas jsonDatas { get; private set; }
 
         public UnityEvent OnDataParsed;                         // 파싱된 데이터를 알리는 이벤트
         string _apiKey = "AIzaSyCsyqqXiR26jn_xlk5UTmDdKdKqLoHyw1U";
-        
+        private DetailModel _detailModel;
+
+        private void Start()
+        {
+            _detailModel = FindObjectOfType<DetailModel>();
+        }
 
         #region api 요청
         public void SearchPlaces(string query)
@@ -41,6 +46,7 @@ namespace AR.Models
                 else
                 {
                     string response = webRequest.downloadHandler.text;
+                    Debug.Log(response);
                     ParseData(response);
                     OnDataParsed.Invoke();                              // 서치 완료 (PlaceSearchController)
                 }
@@ -52,6 +58,7 @@ namespace AR.Models
         private void ParseData(string jsonData)
         {
             PlacesData = JsonConvert.DeserializeObject<PlacesResponse>(jsonData);
+            Debug.Log(PlacesData.results);
         }
 
         public void SaveData(string name,string place_id)
@@ -63,6 +70,33 @@ namespace AR.Models
         {
             Instance.RemovePlaceIdData(name);
         }
+        
         #endregion
+
+        public void OnClickDetailView(string name)
+        {
+            // 저장 기록 넘기기
+            foreach (var place in jsonDatas.datas)
+            {
+                _detailModel.Toss(place.PlaceId);
+            }
+
+            foreach (var place in PlacesData.results)
+            {
+                if(place.name == name)
+                {
+                    _detailModel.Toss(place.place_id);
+                    Instance.AddPlaceIdData(place.name, place.place_id);
+                    break;
+                }
+            }
+            
+            Instance.LoadPlacesDatas();
+        }
+
+        public void OnClickListDestroy(string name)
+        {
+            LoadDataDelete(name);
+        }
     }
 }

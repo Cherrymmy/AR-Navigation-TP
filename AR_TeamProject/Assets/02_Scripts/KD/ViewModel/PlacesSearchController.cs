@@ -12,14 +12,16 @@ namespace AR
         // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         private PlaceSearchView _psview;
         private PlacesModel _placesModel;
+        private DetailModel _detailModel;
         // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
         void Start()
         {
             _psview = FindAnyObjectByType<PlaceSearchView>();
             _placesModel = FindAnyObjectByType<PlacesModel>();
+            _detailModel = FindAnyObjectByType<DetailModel>();
 
-            /* PlaceSearchView Event */                                                                                  
+            /* PlaceSearchView Event */
             // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
             _psview.OnInputFieldSelect.AddListener(ReSearchCreate);                                                      // 인풋 필드 선택시
             _psview.OnInputFieldChange.AddListener(PlaceSearch);                                                         // 인풋 필드 값 변경시
@@ -29,10 +31,6 @@ namespace AR
             // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
             _placesModel.OnDataParsed.AddListener(SearchCreate);                                                         // 서치 완료 이벤트
 
-            /* objectPool 생성 이벤트 */
-            // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-            ObjectPool.Instance.OnDetailView.AddListener(OnDetailView);
-            ObjectPool.Instance.OnListDestroy.AddListener(OnListDestroy);
 
 
         }
@@ -52,12 +50,11 @@ namespace AR
         /// </summary>
         private void ReSearchCreate()
         {
-
             ReSearchClear();
             var placesDatas = DataManager.Instance.jsonDatas.datas;
             foreach (var place in placesDatas)
             {
-                name = place.Name;
+                string name = place.Name;
                 Debug.Log(name);
                 ObjectPool.Instance.GetReSearchListElement(name);
             }
@@ -91,15 +88,7 @@ namespace AR
         }
         #endregion
 
+        
 
-        private void OnDetailView()
-        {
-            
-        }
-
-        private void OnListDestroy()
-        {
-
-        }
     }
 }

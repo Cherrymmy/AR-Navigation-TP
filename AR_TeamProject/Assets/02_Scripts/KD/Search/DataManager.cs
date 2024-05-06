@@ -98,6 +98,7 @@ namespace AR
         /// <param name="placeId"> 장소 id값 </param>
         public void AddPlaceIdData(string name, string placeId)
         {
+            Debug.Log("저장" + name + placeId);
             string jsonPath = Path.Combine(Application.persistentDataPath, "places_datas.json");
             PlacesDatas placesDatas = LoadData<PlacesDatas>(jsonPath);
 
