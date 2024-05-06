@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 
-public class StaticMapRenderer : MonoBehaviour, IStaticMapObserver
+public class MiniMapRenderer : MonoBehaviour, IStaticMapObserver
 {
     // url 데이터
     [SerializeField] private string _apiKey;
