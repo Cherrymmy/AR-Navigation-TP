@@ -8,47 +8,52 @@ using static AR.DataManager;
 
 namespace AR
 {
+
     public class DetailModel : MonoBehaviour
     {
+
         string apiKey = "AIzaSyCsyqqXiR26jn_xlk5UTmDdKdKqLoHyw1U";
-        public PlacesResponse jsonResponse;
+        public PlaceDetailsResponse placeDetailsResponse { get; set; }
 
+        public UnityEvent OnDetailSearchComplete;
+        public Texture2D texture;
 
-        private void Start()
-        {
-
-        }
 
         public void Toss(string name)
         {
             Details(name);
         }
-       
-        private void Details(string name)
+        
+        public void ReToss(string name)
         {
-            // search 값에 있으면 여기서 돌고
-            foreach (var result in jsonResponse.results)
-            {
-                if (result.name == name)
-                {
-                    // 검색기록 저장하기
-                    DataManager.Instance.AddPlaceIdData(name, result.place_id);
-                    string fields = "name,photos,geometry,vicinity,editorial_summary";
-                    string placeDetailsUrl = $"https://maps.googleapis.com/maps/api/place/details/json?placeid={result.place_id}&fields={fields}&key={apiKey}&language=ko";
-                    // Place Detail 경도 위도 받기
-                    StartCoroutine(PlaceDetails(placeDetailsUrl));
-                    break;
-                }
-            }
-            // 검색 기록에 있으면 여기 실행함 (DataMager)
-            foreach (var data in Instance.jsonDatas.datas)
+
+            ReDetails(name);
+        }
+
+        // search 값에 있으면 여기서 돌고
+        private void Details(string placesId)
+        {
+                // 검색기록 저장하기
+                string fields = "name,photos,geometry,vicinity,editorial_summary,reviews,user_ratings_total,type,formatted_phone_number";
+                string placeDetailsUrl = $"https://maps.googleapis.com/maps/api/place/details/json?placeid={placesId}&fields={fields}&key={apiKey}&language=ko";
+                // Place Detail 경도 위도 받기
+                StartCoroutine(PlaceDetails(placeDetailsUrl));
+        }
+
+        // 검색 기록에 있으면 여기 실행함 (DataMager)
+        private void ReDetails(string name)
+        { 
+
+            foreach (var data in DataManager.Instance.jsonDatas.datas)
             {
                 if (data.Name == name)
                 {
-                    string fields = "name,photos,geometry,vicinity,editorial_summary";
+                    Debug.Log("ReDetails" + name);
+                    //              이름 , 사진 , 경도위도 , 주소 , 상세 설명 ,리뷰 , 총리뷰 , 장소 타입 , 전화번호
+                    string fields = "name,photos,geometry,vicinity,editorial_summary,reviews,user_ratings_total,type,formatted_phone_number";
                     string placeDetailsUrl = $"https://maps.googleapis.com/maps/api/place/details/json?placeid={data.PlaceId}&fields={fields}&key={apiKey}&language=ko";
                     StartCoroutine(PlaceDetails(placeDetailsUrl));
-                    return;
+                    break;
                 }
             }
         }
@@ -62,83 +67,52 @@ namespace AR
                 if (request.isNetworkError || request.isHttpError)
                 {
                     Debug.LogError("상세 정보를 가져오는 중 오류 발생: " + request.error);
-                    // 사용자에게 알리거나 재시도를 고려할 수 있습니다.
                 }
                 else
                 {
                     Debug.Log("응답: " + request.downloadHandler.text);
-                    PlaceDetailsResponse details = JsonUtility.FromJson<PlaceDetailsResponse>(request.downloadHandler.text);
+                    placeDetailsResponse = JsonUtility.FromJson<PlaceDetailsResponse>(request.downloadHandler.text);
 
-                    if (details.status == "OK")
-                    {
-                        Debug.Log("Status: " + details.status);
-                        Debug.Log("Place Name: " + details.result.name);
-                        Debug.Log("Location: Lat " + details.result.geometry.location.lat + ", Lng " + details.result.geometry.location.lng);
-                        Debug.Log("Vicinity: " + details.result.vicinity);
-
-                        foreach (Photo photo in details.result.photos)
-                        {
-                            Debug.Log("Photo Reference: " + photo.photo_reference);
-                            Debug.Log("Photo Height: " + photo.height);
-                            Debug.Log("Photo Width: " + photo.width);
-                        }
-
-                        // 필요한 경우 UI를 상세 정보로 업데이트할 수 있습니다.
-                    }
-                    else
-                    {
-                    }
+                    //Debug.Log(placeDetailsResponse.result.photos[0].photo_reference);
+                    StartCoroutine(LoadImageFromPhoto(placeDetailsResponse.result.photos[0]));
+                    OnDetailSearchComplete.Invoke();
                 }
             }
         }
 
+        public IEnumerator LoadImageFromPhoto(Photo photo)
+        {
+            string imageUrl = GetImageUrl(photo.photo_reference);  // 이미지 URL 구성 함수, 구현 필요
+            using (UnityWebRequest request = UnityWebRequestTexture.GetTexture(imageUrl))
+            {
+                yield return request.SendWebRequest();
 
+                if (request.result != UnityWebRequest.Result.Success)
+                {
+                    Debug.LogError("이미지 로드 실패: " + request.error);
+                    UIManager.Instance.LoadingSet = false;
+                }
+                else
+                {
+                    texture = DownloadHandlerTexture.GetContent(request);
+                    // uiImage.sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
+                    UIManager.Instance.LoadingSet = false;
+                }
+            }
+        }
+
+        private string GetImageUrl(string photoReference)
+        {
+            return $"https://maps.googleapis.com/maps/api/place/photo?maxwidth=200&photoreference={photoReference}&key={apiKey}";
+        }
+
+        public void OnClickCall()
+        {
+            string phoneNumber = placeDetailsResponse.result.formattedPhoneNumber;
+            string url = "tel:" + phoneNumber;
+
+            Application.OpenURL(url);
+        }
     }
-
-    [System.Serializable]
-    public class PlaceDetailsResponse
-    {
-        public Result result;
-        public string status;
-    }
-
-    [System.Serializable]
-    public class Result
-    {
-        public Geometry geometry;
-        public string name;
-        public Photo[] photos;
-        public string vicinity;
-    }
-
-    [System.Serializable]
-    public class Geometry
-    {
-        public Location location;
-        public Viewport viewport;
-    }
-
-    [System.Serializable]
-    public class Location
-    {
-        public float lat;
-        public float lng;
-    }
-
-    [System.Serializable]
-    public class Viewport
-    {
-        public Location northeast;
-        public Location southwest;
-    }
-
-    [System.Serializable]
-    public class Photo
-    {
-        public int height;
-        public string photo_reference;
-        public int width;
-    }
-
 }
 

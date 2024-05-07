@@ -11,8 +11,7 @@ namespace AR.Models
 {
     public class PlacesModel : MonoBehaviour
     {
-        public PlacesResponse PlacesData { get; set ; } // 파싱된 데이터 저장
-        public PlacesDatas jsonDatas { get; private set; }
+        public PlacesResponse PlacesData { get; set; } // 파싱된 데이터 저장
 
         public UnityEvent OnDataParsed;                         // 파싱된 데이터를 알리는 이벤트
         string _apiKey = "AIzaSyCsyqqXiR26jn_xlk5UTmDdKdKqLoHyw1U";
@@ -61,7 +60,7 @@ namespace AR.Models
             Debug.Log(PlacesData.results);
         }
 
-        public void SaveData(string name,string place_id)
+        public void SaveData(string name, string place_id)
         {
             Instance.AddPlaceIdData(name, place_id);
         }
@@ -70,28 +69,41 @@ namespace AR.Models
         {
             Instance.RemovePlaceIdData(name);
         }
-        
+
         #endregion
 
+        /// <summary>
+        /// 신규 검색용
+        /// </summary>
+        /// <param name="name"></param>
         public void OnClickDetailView(string name)
         {
-            // 저장 기록 넘기기
-            foreach (var place in jsonDatas.datas)
-            {
-                _detailModel.Toss(place.PlaceId);
-            }
-
             foreach (var place in PlacesData.results)
             {
-                if(place.name == name)
+                if (place.name == name)
                 {
                     _detailModel.Toss(place.place_id);
-                    Instance.AddPlaceIdData(place.name, place.place_id);
+                    DataManager.Instance.AddPlaceIdData(name, place.place_id);
                     break;
                 }
             }
-            
-            Instance.LoadPlacesDatas();
+        }
+
+        /// <summary>
+        /// 이전 검색 기록용
+        /// </summary>
+        /// <param name="name"></param>
+        public void OnClickReDetailView(string name)
+        {
+            // 저장 기록 넘기기
+            foreach (var place in DataManager.Instance.jsonDatas.datas)
+            {
+                if (place.Name == name)
+                {
+                    _detailModel.ReToss(place.Name);
+                    break;
+                }
+            }
         }
 
         public void OnClickListDestroy(string name)

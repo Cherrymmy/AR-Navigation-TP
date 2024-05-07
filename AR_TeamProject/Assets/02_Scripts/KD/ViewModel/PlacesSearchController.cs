@@ -87,8 +87,5 @@ namespace AR
             ObjectPool.Instance.ClearSearchResults();
         }
         #endregion
-
-        
-
     }
 }

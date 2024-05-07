@@ -45,7 +45,6 @@ namespace AR
         public override void Open()
         {
             TargetSwitch();
-            UIManager.Instance.LoadingSet = false;
         }
 
         public override void TargetSwitch()

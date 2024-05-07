@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
@@ -34,12 +35,81 @@ namespace AR
             public string name;
             public string place_id;
         }
+        #region Details 
+        /// <summary>
+        /// Details
+        /// </summary>
+        [System.Serializable]
+        public class PlaceDetailsResponse
+        {
+            public Result result;
+            public string status;
+        }
+
+        [System.Serializable]
+        public class Result
+        {
+            public Geometry geometry;
+            public string name;
+            public Photo[] photos;
+            public string vicinity;
+            public string editorialSummary; // 'editorial_summary' 필드 (응답에 없는 경우 null 처리됨)
+            public Review[] reviews; // 'reviews' 필드
+            public int userRatingsTotal; // 'user_ratings_total' 필드
+            public string type; // 'type' 필드 (응답에 없는 경우 null 처리됨)
+            public string formattedPhoneNumber; // 'formatted_phone_number' 필드 (응답에 없는 경우 null 처리됨)
+        }
+
+        [System.Serializable]
+        public class Geometry
+        {
+            public Location location;
+            public Viewport viewport;
+        }
+
+        [System.Serializable]
+        public class Location
+        {
+            public float lat;
+            public float lng;
+        }
+
+        [System.Serializable]
+        public class Viewport
+        {
+            public Location northeast;
+            public Location southwest;
+        }
+
+        [System.Serializable]
+        public class Photo
+        {
+            public int height;
+            public string photo_reference;
+            public int width;
+            public string[] htmlAttributions; // 이 필드가 누락된 것 같습니다. 'html_attributions' 정보를 저장할 필드
+        }
+
+        [System.Serializable]
+        public class Review
+        {
+            public string authorName; // 리뷰 작성자 이름
+            public string text; // 리뷰 텍스트
+            public int rating; // 리뷰 평점
+            public string authorUrl; // 리뷰 작성자 URL
+            public string profilePhotoUrl; // 작성자 프로필 사진 URL
+            public string language; // 리뷰 언어
+            public string relativeTimeDescription; // 리뷰 상대적 시간 설명
+            public long time; // 리뷰 작성 시간 (UNIX timestamp)
+        }
+
+        #endregion
 
         public PlacesDatas jsonDatas { get; private set; }
+        public PlacesResponse placesResponse { get; private set; }
 
 
         public static DataManager Instance { get; private set; }
-        // JSON 데이터를 담는 속성입니다.
 
 
         private void Awake()

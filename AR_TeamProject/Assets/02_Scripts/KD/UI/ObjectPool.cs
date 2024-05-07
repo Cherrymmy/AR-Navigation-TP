@@ -23,6 +23,7 @@ namespace AR
 
         // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         private PlacesModel _placesModel;
+        private PlaceSearchView _placeSearchView;
 
         /* ObjectPool List */
         // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -50,6 +51,7 @@ namespace AR
         private void Start()
         {
             _placesModel = FindAnyObjectByType<PlacesModel>();
+            _placeSearchView = FindAnyObjectByType<PlaceSearchView>();
             InitializePool();
         }
 
@@ -87,7 +89,7 @@ namespace AR
                     Button detailButton = obj.GetComponentInChildren<Button>();
                     listname.text = name;
 
-                    detailButton.onClick.AddListener(() => _placesModel.OnClickDetailView(name)); 
+                    detailButton.onClick.AddListener(delegate { _placesModel.OnClickDetailView(name); _placeSearchView.Open();}); 
 
                     obj.SetActive(true);
                     return obj;
@@ -112,7 +114,7 @@ namespace AR
                     listname.text = name;
 
                     // DetailButton
-                    Button[0].onClick.AddListener(() => _placesModel.OnClickDetailView(name));
+                    Button[0].onClick.AddListener(delegate { _placesModel.OnClickReDetailView(name); _placeSearchView.Open();});
                     // DstroyButton
                     Button[1].onClick.AddListener(delegate { _placesModel.OnClickListDestroy(name); ReturnReSearchListElement(obj); });
 
