@@ -5,14 +5,17 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/01_Scenes/CL/LoadingScene.unity
     guid: 96854308f35f9dd469ddf6bf4dd59afe
-  - enabled: 1
+  - enabled: 0
     path: Assets/01_Scenes/StaticMap.unity
     guid: 9fc0d4010bbf28b4594072e72b8655ab
+  - enabled: 1
+    path: Assets/01_Scenes/YW/ARPets.unity
+    guid: 566a5215eed6d2a4ca0d86657df76a69
   m_configObjects:
-    UnityEditor.XR.ARCore.ARCoreSettings: {fileID: 11400000, guid: 38cb7f4d80231a04b8bbcf055b2a2cf6, type: 2}
-    UnityEditor.XR.ARKit.ARKitSettings: {fileID: 11400000, guid: 1e25db7630a7e5f43bcc09401f637d90, type: 2}
-    com.unity.xr.arfoundation.simulation_settings: {fileID: 11400000, guid: 398cc362366ae8e419057ca09c93615b, type: 2}
+    UnityEditor.XR.ARCore.ARCoreSettings: {fileID: 11400000, guid: f25adb7ae2be10d4cbb7ab742d595c49, type: 2}
+    UnityEditor.XR.ARKit.ARKitSettings: {fileID: 11400000, guid: fb629c2dc43235d4baf3a4e5e7234301, type: 2}
+    com.unity.xr.arfoundation.simulation_settings: {fileID: 11400000, guid: a714518cbdadbbc4eae39e33438a0988, type: 2}
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 54a01d822b5483444882c6a3b5ef0472, type: 2}
