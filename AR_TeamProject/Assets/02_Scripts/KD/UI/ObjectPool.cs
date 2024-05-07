@@ -62,8 +62,6 @@ namespace AR
                 GameObject reSearchList = Instantiate(uiPrefab[1], uiParent.transform);
                 reSearchList.SetActive(false);
                 _reSearchListPool.Add(reSearchList);
-                Debug.Log(_reSearchListPool.Count);
-
             }
 
             for (int i = 0; i < poolSize; i++)
