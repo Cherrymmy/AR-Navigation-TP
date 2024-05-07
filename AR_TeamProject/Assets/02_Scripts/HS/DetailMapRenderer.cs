@@ -36,7 +36,6 @@ public class DetailMapRenderer : MonoBehaviour, IStaticMapObserver
         _mapData.RemoveStaticMapObserver(this);
     }
 
-    // Start is called before the first frame update
     void Start()
     {
         _rect = GetComponent<RawImage>().rectTransform.rect;
@@ -44,12 +43,6 @@ public class DetailMapRenderer : MonoBehaviour, IStaticMapObserver
         _mapHeight = (int)Math.Round(_rect.height);
 
         StartCoroutine(GetGoogleStaticMap());
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 
     public void UpdateData(float lat, float lon, int zoom)

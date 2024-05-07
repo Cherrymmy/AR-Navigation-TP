@@ -54,12 +54,6 @@ public class StaticMapRenderer : MonoBehaviour, IStaticMapObserver
         StartCoroutine(GetGoogleStaticMap());
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
     IEnumerator GetGoogleStaticMap()
     {
         _rect = GetComponent<RawImage>().rectTransform.rect;

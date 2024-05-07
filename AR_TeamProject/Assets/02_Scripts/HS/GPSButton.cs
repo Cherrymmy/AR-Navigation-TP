@@ -10,7 +10,7 @@ public class GPSButton : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     private void Start()
     {
-        _googleMap = GameObject.Find("RawImage - StaticMap").GetComponent<GoogleMap>();   
+        _googleMap = GameObject.Find("GoogleMap").GetComponent<GoogleMap>();   
     }
 
     public void OnPointerDown(PointerEventData eventData)
