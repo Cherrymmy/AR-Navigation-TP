@@ -29,16 +29,21 @@ public class GoogleMap : MonoBehaviour, ISubject
     private Rect rect;
     private string apiKeyLast;
 
-    private float latLast = -33.85660f;
-    private float lonLast = 151.21500f;
+    private float _latLast = -33.85660f;
+    private float _lonLast = 151.21500f;
 
     public int Zoom { get => _zoom; set => _zoom = value; }
     private int _zoom = 14;
     public int ZoomLast { get => _zoomLast; }
     private int _zoomLast = 14;
     private resolution mapResolutionLast = resolution.low;
-    private type mapTypeLast = type.roadmap;
-    private bool updateMap = true;
+    private type _mapTypeLast = type.roadmap;
+    public bool UpdateMap
+    {
+        get => _updateMap;
+        set => _updateMap = value;
+    }
+    private bool _updateMap = true;
 
     private GameObject GPSManager;
 
@@ -108,14 +113,6 @@ public class GoogleMap : MonoBehaviour, ISubject
     private float _destinationLat;
     private float _destinationLon;
 
-    // Canvas
-    private Canvas _staticMapCanvas;
-    private Canvas _detailMapCanvas;
-    private Canvas _naviMapCanvas;
-    private Canvas _miniMapCanvas;
-    private RawImage _staticMapRenderer;
-    private RawImage _detailMapRenderer;
-
     // ObserverPattern
     private List<IStaticMapObserver> _staticMapObserver = new List<IStaticMapObserver>();
     private List<IDirectionMapObserver> _directionMapObserver = new List<IDirectionMapObserver>();
@@ -137,17 +134,8 @@ public class GoogleMap : MonoBehaviour, ISubject
     private void Start()
     {
         GPSManager = GameObject.Find("GPSManager");
-        //_staticMapCanvas = GameObject.Find("Canvas - StaticMap").GetComponent<Canvas>();
-        //_detailMapCanvas = GameObject.Find("Canvas - Detail").GetComponent<Canvas>();
-        //_naviMapCanvas = GameObject.Find("Canvas - NaviMap").GetComponent<Canvas>();
-        //_miniMapCanvas = GameObject.Find("Canvas - MiniMap").GetComponent<Canvas>();
-        _staticMapRenderer = GameObject.Find("RawImage - StaticMap").GetComponent<RawImage>();
-        //_detailMapRenderer = GameObject.Find("RawImage - DetailMap").GetComponent<RawImage>();
-        //_detailMapRenderer.enabled = false;
         _marker = GameObject.Find("Image - Marker").GetComponent<Image>();
         _markerInitPos = _marker.rectTransform.anchoredPosition;
-
-
 
         //StartCoroutine(GetGoogleMap());
         //rect = gameObject.GetComponent<RawImage>().rectTransform.rect;
@@ -184,8 +172,8 @@ public class GoogleMap : MonoBehaviour, ISubject
 
     private void Update()
     {
-        if (updateMap && (apiKeyLast != apiKey || Mathf.Approximately(latLast, /*lat*/_gpsLat) || Mathf.Approximately(lonLast, /*lon*/_gpsLon) ||
-                        /*zoomLast != zoom ||*/ mapResolutionLast != _mapResolution || mapTypeLast != _maptype || !_isGPSWorked))
+        if (_updateMap && (apiKeyLast != apiKey || Mathf.Approximately(_latLast, /*lat*/_gpsLat) || Mathf.Approximately(_lonLast, /*lon*/_gpsLon) ||
+                        /*zoomLast != zoom ||*/ mapResolutionLast != _mapResolution || _mapTypeLast != _maptype || !_isGPSWorked))
         {
             // zoom in & out
             ZoomInAndOut();
@@ -205,11 +193,10 @@ public class GoogleMap : MonoBehaviour, ISubject
             //StartCoroutine(GetDirections());
             UpdateStaticMap();
 
-            latLast = _gpsLat;
-            lonLast = _gpsLon;
+            _latLast = _gpsLat;
+            _lonLast = _gpsLon;
             _zoomLast = _zoom;
-
-            //updateMap = false;
+            //_updateMap = false;
         }
     }
 
@@ -244,12 +231,12 @@ public class GoogleMap : MonoBehaviour, ISubject
             apiKeyLast = apiKey;
             //latLast = lat;
             //lonLast = lon;
-            latLast = _gpsLat;
-            lonLast = _gpsLon;
+            _latLast = _gpsLat;
+            _lonLast = _gpsLon;
             _zoomLast = _zoom;
             mapResolutionLast = _mapResolution;
-            mapTypeLast = _maptype;
-            updateMap = true;
+            _mapTypeLast = _maptype;
+            _updateMap = true;
         }
 
         // 코루틴 종료
@@ -456,14 +443,12 @@ public class GoogleMap : MonoBehaviour, ISubject
     public void OnCloseButton()
     {
         //_destinationPos = "&markers=" + "color:" + GoogleMapColor.purple + "|" + _markerLat + "," + _markerLon;
-        _staticMapRenderer.enabled = false;
-        //_detailMapRenderer.enabled = true;
+
         //목적지 설정 및 캔버스 닫기
         _gpsLat = 37.7127491f;
         _gpsLon = 126.7615354f;
         _isGPSOn = false;
         Debug.Log("마커 위치 : " +  _gpsLat + ", " + _gpsLon);
-
     }
 
     public void OntestButton()
@@ -472,8 +457,6 @@ public class GoogleMap : MonoBehaviour, ISubject
         //detailMapRenderer.enabled = false;
 
         //_staticMapCanvas.sortingOrder = 5;
-        _staticMapRenderer.enabled = true;
-        //_detailMapRenderer.enabled = false;
     }
 
     public void ResisterStaticMapObserver(IStaticMapObserver observer)

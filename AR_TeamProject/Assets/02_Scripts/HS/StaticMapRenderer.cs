@@ -29,6 +29,7 @@ public class StaticMapRenderer : MonoBehaviour, IStaticMapObserver
         _gpsLon = lon;
         _zoom = zoom;
         //Debug.Log("UpdateData");
+
         StartCoroutine(GetGoogleStaticMap());
     }
 
@@ -79,7 +80,15 @@ public class StaticMapRenderer : MonoBehaviour, IStaticMapObserver
         }
         else
         {
+            // 이전에 할당된 텍스처 해제
+            if (GetComponent<RawImage>().texture != null)
+            {
+                Destroy(GetComponent<RawImage>().texture);
+            }
+
             GetComponent<RawImage>().texture = ((DownloadHandlerTexture)www.downloadHandler).texture;
+
+            //_mapData.UpdateMap = true;
         }
 
         // 코루틴 종료

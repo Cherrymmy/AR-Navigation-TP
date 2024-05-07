@@ -51,11 +51,20 @@ public class DetailMapRenderer : MonoBehaviour, IStaticMapObserver
         _gpsLon = lon;
         _zoom = zoom;
         //Debug.Log("UpdateData");
-        StartCoroutine(GetGoogleStaticMap());
+        try
+        {
+            StartCoroutine(GetGoogleStaticMap());
+        }
+        catch (Exception ex)
+        {
+            CrushReport.Write("", "", ex);
+        }
     }
 
     IEnumerator GetGoogleStaticMap()
     {
+
+
         _rect = GetComponent<RawImage>().rectTransform.rect;
         _mapWidth = (int)Math.Round(_rect.width);
         _mapHeight = (int)Math.Round(_rect.height);
