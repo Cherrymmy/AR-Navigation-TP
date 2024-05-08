@@ -1,7 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using UnityEngine;
-using UnityEngine.Events;
 
 namespace AR
 {
@@ -12,7 +13,7 @@ namespace AR
         private DetailModel _model;
         private DetailView _view;
         //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-        
+
 
 
         private void Start()
@@ -26,7 +27,11 @@ namespace AR
         {
             _view.placename.text = _model.placeDetailsResponse.result.name;
             _view.placeAddress.text = _model.placeDetailsResponse.result.vicinity;
-            //_view.totalRiviews.text = _model.placeDetailsResponse.result.
+            _view.totalRiviews.text = _model.placeDetailsResponse.result.user_ratings_total.ToString();
+            _view.callButton.onClick.AddListener(_model.OnClickCall);               // 버튼 클릭 시 전화
+            _view.rating = _model.placeDetailsResponse.result.rating;
+            _view.photoLength.text = _model.placeDetailsResponse.result.photos.Length.ToString();
+
             Debug.Log(_model.texture);
             if (_model.texture != null)
             {
@@ -38,7 +43,11 @@ namespace AR
             {
                 Debug.LogError("Texture not loaded yet");
             }
+
+            _view.UpdateStarRating(_model.placeDetailsResponse.result.rating);
+
+            UIManager.Instance.LoadingSet = false;
         }
-        
     }
+        
 }

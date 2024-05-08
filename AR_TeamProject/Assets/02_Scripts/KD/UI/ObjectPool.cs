@@ -31,10 +31,6 @@ namespace AR
         private List<GameObject> _reSearchListPool = new List<GameObject>();
         // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-        /* 이벤트 관리 */
-        // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-
 
         private void Awake()
         {
@@ -55,6 +51,9 @@ namespace AR
             InitializePool();
         }
 
+        /// <summary>
+        /// 로딩시 프리펩 만들기
+        /// </summary>
         private void InitializePool()
         {
             for (int i = 0; i < poolSize; i++)
@@ -62,8 +61,6 @@ namespace AR
                 GameObject reSearchList = Instantiate(uiPrefab[1], uiParent.transform);
                 reSearchList.SetActive(false);
                 _reSearchListPool.Add(reSearchList);
-                Debug.Log(_reSearchListPool.Count);
-
             }
 
             for (int i = 0; i < poolSize; i++)
@@ -89,7 +86,7 @@ namespace AR
                     Button detailButton = obj.GetComponentInChildren<Button>();
                     listname.text = name;
 
-                    detailButton.onClick.AddListener(delegate { _placesModel.OnClickDetailView(name); _placeSearchView.Open();}); 
+                    detailButton.onClick.AddListener(delegate { _placesModel.OnClickDetailView(name); _placeSearchView.Open();});
 
                     obj.SetActive(true);
                     return obj;
@@ -97,6 +94,7 @@ namespace AR
             }
             return null; 
         }
+
         /// <summary>
         /// 이전 검색 기록
         /// </summary>
@@ -127,11 +125,21 @@ namespace AR
 
         public void ReturnSearchListElement(GameObject uiElement)
         {
+            Button[] buttons = uiElement.GetComponentsInChildren<Button>();
+            foreach (Button button in buttons)
+            {
+                button.onClick.RemoveAllListeners();
+            }
             uiElement.SetActive(false);
         }
 
         public void ReturnReSearchListElement(GameObject uiElement)
         {
+            Button[] buttons = uiElement.GetComponentsInChildren<Button>();
+            foreach (Button button in buttons)
+            {
+                button.onClick.RemoveAllListeners();
+            }
             uiElement.SetActive(false);
         }
 

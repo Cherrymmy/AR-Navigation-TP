@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System.Globalization;
+using System;
 
 namespace AR
 {
@@ -14,17 +16,18 @@ namespace AR
         [Header("UI")]
         public Button exitButton;
         public Button nextButton;
-        [Header("뱃지")]
-        public TMP_Text Badgetxet1;
-        public TMP_Text Badgetxet2;
         [Header("장소")]
         public TMP_Text placename;
         public TMP_Text placeAddress;
         [Header("사진")]
         public Image currentImage;
+        public TMP_Text photoLength;
+        [Header("전화")]
+        public Button callButton;
         [Header("리뷰")]
-        public int riviews;
+        public float rating;
         public TMP_Text totalRiviews;
+        public GameObject[] stars;
 
 
         private void Start()
@@ -39,15 +42,13 @@ namespace AR
         public override void Close()
         {
             TargetSwitch2Meun();
+            UIManager.Instance.LoadingSet = false;
         }
 
         public override void Open()
         {
             TargetSwitch();
-
-            // 상대방 준비되면 시작 
             UIManager.Instance.LoadingSet = false;
-
         }
 
         public override void TargetSwitch()
@@ -58,12 +59,26 @@ namespace AR
         public void TargetSwitch2Meun()
         {
             UIManager.Instance.Switch(CurrentMenu, TargetMeun2Type);
-            UIManager.Instance.LoadingSet = false;
         }
         #endregion
 
+        public void UpdateStarRating(float rating)
+        {
+            int roundedRating = (int)Math.Floor(rating); // 평점 반내림
 
+            for (int i = 0; i < stars.Length; i++)
+            {
+                
+                if (i < roundedRating)
+                {
+                    stars[i].gameObject.SetActive(true);
+                }
+                else
+                {
+                    stars[i].gameObject.SetActive(false);
+                }
+            }
+        }
     }
 
 }
-

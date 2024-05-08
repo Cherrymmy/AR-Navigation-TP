@@ -55,9 +55,10 @@ namespace AR
             public string vicinity;
             public string editorialSummary; // 'editorial_summary' 필드 (응답에 없는 경우 null 처리됨)
             public Review[] reviews; // 'reviews' 필드
-            public int userRatingsTotal; // 'user_ratings_total' 필드
-            public string type; // 'type' 필드 (응답에 없는 경우 null 처리됨)
+            public int user_ratings_total; // 'user_ratings_total' 필드
+            public string[] type; // 'type' 필드 (응답에 없는 경우 null 처리됨)
             public string formattedPhoneNumber; // 'formatted_phone_number' 필드 (응답에 없는 경우 null 처리됨)
+            public float rating;
         }
 
         [System.Serializable]
@@ -106,8 +107,7 @@ namespace AR
         #endregion
 
         public PlacesDatas jsonDatas { get; private set; }
-        public PlacesResponse placesResponse { get; private set; }
-
+        public PlacesResponse PlacesData { get; set; } 
 
         public static DataManager Instance { get; private set; }
 

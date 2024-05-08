@@ -1,4 +1,5 @@
 using System.Collections;
+using System;
 using UnityEngine;
 
 public class UIManager : MonoBehaviour
@@ -48,7 +49,7 @@ public class UIManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject); // 싱글톤 인스턴스를 다른 씬으로 넘어가도 파괴되지 않게 합니다.
+            DontDestroyOnLoad(gameObject); 
         }
         else
         {
@@ -75,6 +76,7 @@ public class UIManager : MonoBehaviour
         int currentIndex = (int)currentMenu;
         int targetIndex = (int)targetMenu;
         StartCoroutine(LodingPopUp(currentIndex, targetIndex));
+        //SwapMenuScreens(currentIndex,targetIndex);
     }
 
     private void SwapMenuScreens(int indexA, int indexB)
@@ -107,5 +109,17 @@ public class UIManager : MonoBehaviour
         SwapMenuScreens(currentIndex, targetIndex);
     }
 
-    
+    /*
+    private void LodingPopUp2()
+    {
+        lodingPopUpSceen?.SetActive(true);
+        LodingPopUpClose();
+    }
+
+    private void LodingPopUpClose()
+    {
+        lodingPopUpSceen?.SetActive(false);
+    }
+
+    */
 }

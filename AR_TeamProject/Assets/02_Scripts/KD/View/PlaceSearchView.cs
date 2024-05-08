@@ -40,6 +40,7 @@ namespace AR
         public override void Close()
         {
             TargetSwitch2Meun();
+            UIManager.Instance.LoadingSet = false;
         }
 
         public override void Open()
@@ -55,7 +56,6 @@ namespace AR
         public void TargetSwitch2Meun()
         {
             UIManager.Instance.Switch(CurrentMenu, TargetMeun2Type);
-            UIManager.Instance.LoadingSet = false;
         }
 
         public void ReSearchListCreate()

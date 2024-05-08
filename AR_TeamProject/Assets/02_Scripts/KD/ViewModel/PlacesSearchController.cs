@@ -27,9 +27,10 @@ namespace AR
             _psview.OnInputFieldChange.AddListener(PlaceSearch);                                                         // 인풋 필드 값 변경시
             // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-            /* placeSearch 완료시 */
+            /* placeSearchModel Event */
             // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
             _placesModel.OnDataParsed.AddListener(SearchCreate);                                                         // 서치 완료 이벤트
+            _placesModel.OnDataUpdated.AddListener(ReSearchCreate);                                                      // 이전 기록 저장시
 
 
 
@@ -55,7 +56,6 @@ namespace AR
             foreach (var place in placesDatas)
             {
                 string name = place.Name;
-                Debug.Log(name);
                 ObjectPool.Instance.GetReSearchListElement(name);
             }
         }
@@ -66,12 +66,11 @@ namespace AR
         /// </summary>
         private void SearchCreate()
         {
-            //ReSearchClear();
             SearchClear();
-            var list = _placesModel.PlacesData.results;
+            var list = DataManager.Instance.PlacesData.results;
             foreach (var place in list)
             {
-                name = place.name;
+                string name = place.name;
                 ObjectPool.Instance.GetSearchListElement(name);
             }
         }

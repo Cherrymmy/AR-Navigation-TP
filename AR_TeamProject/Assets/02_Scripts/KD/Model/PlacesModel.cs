@@ -11,9 +11,10 @@ namespace AR.Models
 {
     public class PlacesModel : MonoBehaviour
     {
-        public PlacesResponse PlacesData { get; set; } // 파싱된 데이터 저장
 
         public UnityEvent OnDataParsed;                         // 파싱된 데이터를 알리는 이벤트
+        public UnityEvent OnDataUpdated;                        // 저장되면
+
         string _apiKey = "AIzaSyCsyqqXiR26jn_xlk5UTmDdKdKqLoHyw1U";
         private DetailModel _detailModel;
 
@@ -56,8 +57,8 @@ namespace AR.Models
         #region search data 저장
         private void ParseData(string jsonData)
         {
-            PlacesData = JsonConvert.DeserializeObject<PlacesResponse>(jsonData);
-            Debug.Log(PlacesData.results);
+            DataManager.Instance.PlacesData = JsonConvert.DeserializeObject<PlacesResponse>(jsonData);
+            Debug.Log(DataManager.Instance.PlacesData.results);
         }
 
         public void SaveData(string name, string place_id)
@@ -78,12 +79,13 @@ namespace AR.Models
         /// <param name="name"></param>
         public void OnClickDetailView(string name)
         {
-            foreach (var place in PlacesData.results)
+            foreach (var place in DataManager.Instance.PlacesData.results)
             {
                 if (place.name == name)
                 {
-                    _detailModel.Toss(place.place_id);
-                    DataManager.Instance.AddPlaceIdData(name, place.place_id);
+                    _detailModel.Toss(name);
+                    SaveData(name, place.place_id);
+                    OnDataUpdated.Invoke();
                     break;
                 }
             }

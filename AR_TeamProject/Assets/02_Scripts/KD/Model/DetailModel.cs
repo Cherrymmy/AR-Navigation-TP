@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -13,6 +14,7 @@ namespace AR
     {
 
         string apiKey = "AIzaSyCsyqqXiR26jn_xlk5UTmDdKdKqLoHyw1U";
+        string fields = "name,photos,geometry,vicinity,editorial_summary,reviews,user_ratings_total,type,formatted_phone_number,rating";
         public PlaceDetailsResponse placeDetailsResponse { get; set; }
 
         public UnityEvent OnDetailSearchComplete;
@@ -31,13 +33,17 @@ namespace AR
         }
 
         // search 값에 있으면 여기서 돌고
-        private void Details(string placesId)
+        private void Details(string name)
         {
-                // 검색기록 저장하기
-                string fields = "name,photos,geometry,vicinity,editorial_summary,reviews,user_ratings_total,type,formatted_phone_number";
-                string placeDetailsUrl = $"https://maps.googleapis.com/maps/api/place/details/json?placeid={placesId}&fields={fields}&key={apiKey}&language=ko";
-                // Place Detail 경도 위도 받기
-                StartCoroutine(PlaceDetails(placeDetailsUrl));
+            // 검색기록 저장하기
+            foreach (var data in DataManager.Instance.PlacesData.results)
+            {
+                if(data.name == name)
+                {
+                    string placeDetailsUrl = $"https://maps.googleapis.com/maps/api/place/details/json?placeid={data.place_id}&fields={fields}&key={apiKey}&language=ko";
+                    StartCoroutine(PlaceDetails(placeDetailsUrl));
+                }
+            }
         }
 
         // 검색 기록에 있으면 여기 실행함 (DataMager)
@@ -48,9 +54,6 @@ namespace AR
             {
                 if (data.Name == name)
                 {
-                    Debug.Log("ReDetails" + name);
-                    //              이름 , 사진 , 경도위도 , 주소 , 상세 설명 ,리뷰 , 총리뷰 , 장소 타입 , 전화번호
-                    string fields = "name,photos,geometry,vicinity,editorial_summary,reviews,user_ratings_total,type,formatted_phone_number";
                     string placeDetailsUrl = $"https://maps.googleapis.com/maps/api/place/details/json?placeid={data.PlaceId}&fields={fields}&key={apiKey}&language=ko";
                     StartCoroutine(PlaceDetails(placeDetailsUrl));
                     break;
@@ -72,15 +75,12 @@ namespace AR
                 {
                     Debug.Log("응답: " + request.downloadHandler.text);
                     placeDetailsResponse = JsonUtility.FromJson<PlaceDetailsResponse>(request.downloadHandler.text);
-
-                    //Debug.Log(placeDetailsResponse.result.photos[0].photo_reference);
-                    StartCoroutine(LoadImageFromPhoto(placeDetailsResponse.result.photos[0]));
-                    OnDetailSearchComplete.Invoke();
+                    StartCoroutine(LoadImageFromPhoto(placeDetailsResponse.result.photos[0], OnImageLoaded));
                 }
             }
         }
 
-        public IEnumerator LoadImageFromPhoto(Photo photo)
+        public IEnumerator LoadImageFromPhoto(Photo photo, Action callback)
         {
             string imageUrl = GetImageUrl(photo.photo_reference);  // 이미지 URL 구성 함수, 구현 필요
             using (UnityWebRequest request = UnityWebRequestTexture.GetTexture(imageUrl))
@@ -90,15 +90,21 @@ namespace AR
                 if (request.result != UnityWebRequest.Result.Success)
                 {
                     Debug.LogError("이미지 로드 실패: " + request.error);
-                    UIManager.Instance.LoadingSet = false;
                 }
                 else
                 {
                     texture = DownloadHandlerTexture.GetContent(request);
+                    callback?.Invoke();
                     // uiImage.sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
-                    UIManager.Instance.LoadingSet = false;
                 }
             }
+        }
+
+        
+
+        private void OnImageLoaded()
+        {
+            OnDetailSearchComplete.Invoke();
         }
 
         private string GetImageUrl(string photoReference)
