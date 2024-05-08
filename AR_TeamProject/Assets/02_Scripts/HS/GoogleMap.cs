@@ -113,6 +113,13 @@ public class GoogleMap : MonoBehaviour, ISubject
     private float _destinationLat;
     private float _destinationLon;
 
+    // Canvas
+    private bool _isDetailMapOpen;
+    private Canvas _staticMapCanvas;
+    private Canvas _detailMapCanvas;
+    private Canvas _naviMapCanvas;
+    private GameObject _miniMapCanvas;
+
     // ObserverPattern
     private List<IStaticMapObserver> _staticMapObserver = new List<IStaticMapObserver>();
     private List<IDirectionMapObserver> _directionMapObserver = new List<IDirectionMapObserver>();
@@ -129,13 +136,21 @@ public class GoogleMap : MonoBehaviour, ISubject
         orange,
         red,
         white
-    }
+    }   
 
     private void Start()
     {
+     
         GPSManager = GameObject.Find("GPSManager");
         _marker = GameObject.Find("Image - Marker").GetComponent<Image>();
         _markerInitPos = _marker.rectTransform.anchoredPosition;
+
+        _staticMapCanvas = GameObject.Find("Canvas - StaticMap").GetComponent<Canvas>();
+        _detailMapCanvas = GameObject.Find("Canvas - DetailMap").GetComponent<Canvas>();
+        _naviMapCanvas = GameObject.Find("Canvas - NaviMap").GetComponent<Canvas>();
+
+        _detailMapCanvas.enabled = false;
+        _naviMapCanvas.enabled = false;
 
         //StartCoroutine(GetGoogleMap());
         //rect = gameObject.GetComponent<RawImage>().rectTransform.rect;
@@ -192,11 +207,12 @@ public class GoogleMap : MonoBehaviour, ISubject
             //else
             //StartCoroutine(GetDirections());
             UpdateStaticMap();
+            UpdateDirectionMap();
 
             _latLast = _gpsLat;
             _lonLast = _gpsLon;
             _zoomLast = _zoom;
-            //_updateMap = false;
+            _updateMap = false;
         }
     }
 
@@ -335,7 +351,7 @@ public class GoogleMap : MonoBehaviour, ISubject
     private void ZoomInAndOut()
     {
         // zoom in & out
-        if (Input.touchCount == 2)
+        if (Input.touchCount == 2 && !_isDetailMapOpen)
         {
             if (!_isPinching)
             {
@@ -373,7 +389,7 @@ public class GoogleMap : MonoBehaviour, ISubject
     private void Draging()
     {
         // 입력한 터치값이 1개 일 때
-        if (Input.touchCount == 1 && !_isGPSButtonClick)
+        if (Input.touchCount == 1 && !_isGPSButtonClick && !_isDetailMapOpen)
         {
             if (!_isDraging)
             {
@@ -405,6 +421,12 @@ public class GoogleMap : MonoBehaviour, ISubject
                 Vector2 newpos = new Vector2(0, -verticalTouchDelta);
                 _marker.rectTransform.anchoredPosition += newpos;
                 _gpsLat = _gpsLat + verticalTouchDelta * _dragSpeed;
+            }
+
+            DetailMapRenderer detailMapRenderer = _detailMapCanvas.transform.GetComponentInChildren<DetailMapRenderer>();
+            if (detailMapRenderer != null)
+            {
+                detailMapRenderer.IsDestinationSet = false;
             }
 
             _dragStartPos = curTouchPos;
@@ -442,23 +464,67 @@ public class GoogleMap : MonoBehaviour, ISubject
 
     public void OnCloseButton()
     {
-        //_destinationPos = "&markers=" + "color:" + GoogleMapColor.purple + "|" + _markerLat + "," + _markerLon;
+        //목적지 설정 및 캔버스 닫기(테스트 야당역)
+        _destinationLat = 37.7127491f;
+        _destinationLon = 126.7615354f;
+        //_gpsLat = 37.7127491f;
+        //_gpsLon = 126.7615354f;
+        //_isGPSOn = false;
+        
+        if(_staticMapCanvas != null)
+        {
+            _staticMapCanvas.enabled = false;
+        }
+        if(_detailMapCanvas != null)
+        {
+            _detailMapCanvas.enabled = true;
+        }
 
-        //목적지 설정 및 캔버스 닫기
-        _gpsLat = 37.7127491f;
-        _gpsLon = 126.7615354f;
-        _isGPSOn = false;
-        Debug.Log("마커 위치 : " +  _gpsLat + ", " + _gpsLon);
+        DetailMapRenderer detailMapRenderer = _detailMapCanvas.transform.GetComponentInChildren<DetailMapRenderer>();
+        if(detailMapRenderer != null)
+        {
+            Debug.Log("detailmap renderer destination set");
+            detailMapRenderer.IsDestinationSet = true;
+        }
+
+        // 목적지맵에서는 드래그, 줌인아웃 막기
+        _isDetailMapOpen = true;
     }
 
     public void OntestButton()
     {
-        //DetailMapRenderer detailMapRenderer = GameObject.Find("RawImage - DetailMap").GetComponent<DetailMapRenderer>();
-        //detailMapRenderer.enabled = false;
+        if (_staticMapCanvas != null)
+        {
+            _staticMapCanvas.enabled = true;
+        }
+        if (_detailMapCanvas != null)
+        {
+            _detailMapCanvas.enabled = false;
+        }
 
-        //_staticMapCanvas.sortingOrder = 5;
+        DetailMapRenderer detailMapRenderer = _detailMapCanvas.transform.GetComponentInChildren<DetailMapRenderer>();
+        if (detailMapRenderer != null)
+        {
+            detailMapRenderer.IsDestinationSet = false;
+        }
+
+        // 목적지맵 외 에서는 드래그, 줌인아웃 열기
+        _isDetailMapOpen = false;
     }
 
+    public void OnDrawPathButton()
+    {
+        // 목적지맵 외 에서는 드래그, 줌인아웃 열기
+        _isDetailMapOpen = false;
+
+        _detailMapCanvas.enabled = false;
+        _naviMapCanvas.enabled = true;
+    }
+
+    /// <summary>
+    /// staticMap/DirectionMap Resister
+    /// </summary>
+    /// <param name="observer"></param>
     public void ResisterStaticMapObserver(IStaticMapObserver observer)
     {
         _staticMapObserver.Add(observer);
@@ -491,7 +557,7 @@ public class GoogleMap : MonoBehaviour, ISubject
     {
         foreach(IDirectionMapObserver observer in _directionMapObserver)
         {
-            observer.UpdateData();
+            observer.UpdateData(_gpsLat, _gpsLon, _destinationLat, _destinationLon, _zoom);
         }
     }
 

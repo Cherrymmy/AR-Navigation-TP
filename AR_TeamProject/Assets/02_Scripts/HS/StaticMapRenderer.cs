@@ -88,7 +88,7 @@ public class StaticMapRenderer : MonoBehaviour, IStaticMapObserver
 
             GetComponent<RawImage>().texture = ((DownloadHandlerTexture)www.downloadHandler).texture;
 
-            //_mapData.UpdateMap = true;
+            _mapData.UpdateMap = true;
         }
 
         // 코루틴 종료

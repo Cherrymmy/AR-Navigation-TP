@@ -4,16 +4,24 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
-using static GoogleMap;
 
-public class DetailMapRenderer : MonoBehaviour, IStaticMapObserver
+public class DetailMapRenderer : MonoBehaviour, IDirectionMapObserver
 {
     // url 데이터
     [SerializeField] private string _apiKey;
     private string _url = string.Empty;
-    private float _gpsLat;
-    private float _gpsLon;
-    private int _zoom;
+    public bool IsDestinationSet
+    {
+        get => _isDestinationSet;
+        set => _isDestinationSet = value;
+    }
+
+    private bool _isDestinationSet;
+    private float _desLat;
+    private float _desLon;  
+    private float _markerLat;
+    private float _markerLon;
+    private int _zoom = 18;
     private int _mapWidth;
     private int _mapHeight;
 
@@ -28,12 +36,12 @@ public class DetailMapRenderer : MonoBehaviour, IStaticMapObserver
     {
         _mapData = GameObject.Find("GoogleMap").GetComponent<GoogleMap>();
 
-        _mapData.ResisterStaticMapObserver(this);
+        _mapData.ResisterDirectionMapObserver(this);
     }
 
     private void OnDisable()
     {
-        _mapData.RemoveStaticMapObserver(this);
+        _mapData.ResisterDirectionMapObserver(this);
     }
 
     void Start()
@@ -45,37 +53,33 @@ public class DetailMapRenderer : MonoBehaviour, IStaticMapObserver
         StartCoroutine(GetGoogleStaticMap());
     }
 
-    public void UpdateData(float lat, float lon, int zoom)
+    public void UpdateData(float lat, float lon, float deslat, float deslon, int zoom)
     {
-        _gpsLat = lat;
-        _gpsLon = lon;
-        _zoom = zoom;
-        //Debug.Log("UpdateData");
-        try
+        _desLat = deslat;
+        _desLon = deslon;
+        
+        if(_isDestinationSet)
         {
-            StartCoroutine(GetGoogleStaticMap());
+            _markerLat = deslat;
+            _markerLon = deslon;
         }
-        catch (Exception ex)
-        {
-            CrushReport.Write("", "", ex);
-        }
+
+        StartCoroutine(GetGoogleStaticMap());
     }
 
     IEnumerator GetGoogleStaticMap()
     {
-
-
         _rect = GetComponent<RawImage>().rectTransform.rect;
         _mapWidth = (int)Math.Round(_rect.width);
         _mapHeight = (int)Math.Round(_rect.height);
 
-        _url = "https://maps.googleapis.com/maps/api/staticmap?center=" + _gpsLat + "," + _gpsLon +
-                                                                               "&zoom=" + _zoom +
-                                                                               "&size=" + _mapWidth + "x" + _mapHeight +
-                                                                               "&scale=" + _mapData.MapResolution +
-                                                                               "&markers=" + "color:" + GoogleMapColor.purple + "|" + _gpsLat + "," + _gpsLon +
-                                                                               "&maptype=" + _mapData.MapType +
-                                                                               "&key=" + _apiKey;
+        _url = "https://maps.googleapis.com/maps/api/staticmap?center=" + _desLat + "," + _desLon +
+                                                                      "&zoom=" + _zoom +
+                                                                      "&size=" + _mapWidth + "x" + _mapHeight +
+                                                                      "&scale=" + _mapData.MapResolution +
+                                                                      "&markers=" + "color:" + GoogleMap.GoogleMapColor.purple + "|" + _markerLat + "," + _markerLon +
+                                                                      "&maptype=" + _mapData.MapType +
+                                                                      "&key=" + _apiKey;
 
 
         UnityWebRequest www = UnityWebRequestTexture.GetTexture(_url);
