@@ -3,8 +3,10 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.Networking;
 using UnityEngine.UI;
+using UnityEngine.XR.ARFoundation;
 
 public class GoogleMap : MonoBehaviour
 {
@@ -48,24 +50,50 @@ public class GoogleMap : MonoBehaviour
     private float _markerLon;
 
     // Zoom & Dragging
+    public bool IsGPSOn
+    {
+        get => _isGPSOn;
+        set => _isGPSOn = value;
+    }
+
+    public bool IsGPSButtonClick
+    {
+        get => _isGPSButtonClick;
+        set => _isGPSButtonClick = value;
+    }
+
     private bool _isGPSOn = true;
     private bool _isPinching;
     private bool _isDraging;
+    private bool _isGPSButtonClick;
     
     private float _zoomSpeed = 0.005f;
+    private int _minZoom = 8;
+    private int _maxZoom = 20;
     public float DragSpeed 
     { 
         get => _dragSpeed; 
         set => _dragSpeed = value; 
     }
-    [SerializeField] private float _dragSpeed = 0.000085f;
 
+    [SerializeField] private float _dragSpeed = 0.000085f;
 
     private Vector2 _prevTouch1Pos;
     private Vector2 _prevTouch2Pos;
     private Vector2 _dragStartPos;
 
     // Marker
+    public Vector2 markerPosition
+    {
+        get => _marker.rectTransform.anchoredPosition;
+        set => _marker.rectTransform.anchoredPosition = value;
+    }
+
+    public Vector2 markerInitPosition
+    {
+        get => _markerInitPos;
+    }
+
     private Image _marker;
     private Vector2 _markerInitPos;
 
@@ -77,6 +105,7 @@ public class GoogleMap : MonoBehaviour
     // Destination
     private float _destinationLat;
     private float _destinationLon;
+    //private string _destinationPos;
 
     public enum GoogleMapColor
     {
@@ -129,7 +158,7 @@ public class GoogleMap : MonoBehaviour
                         /*zoomLast != zoom ||*/ mapResolutionLast != mapResolution || mapTypeLast != maptype || !_isGPSWorked))
         {
             // zoom in & out
-            //ZoomInAndOut();
+            ZoomInAndOut();
 
             Draging();
 
@@ -151,7 +180,6 @@ public class GoogleMap : MonoBehaviour
 
     private IEnumerator GetGoogleMap(string path = "")
     {
-        //Debug.Log("zoom : " + zoom);
         url = "https://maps.googleapis.com/maps/api/staticmap?center=" + /*lat*/_gpsLat + "," + /*lon */_gpsLon +
                                                                                 "&zoom=" + _zoom +
                                                                                 "&size=" + mapWidth +
@@ -160,7 +188,7 @@ public class GoogleMap : MonoBehaviour
                                                                                 "&markers=" + "color:" + GoogleMapColor.purple + "|" + _markerLat + "," + _markerLon +
                                                                                 "&maptype=" + maptype +
                                                                                 "&key=" + apiKey +
-                                                                                /*"&path=color:0xff0000ff|weight:5" + */path; // 경로 추가;
+                                                                                path; // 도보 + 대중교통 경로 추가
 
 
         //mapIsLoading = true;
@@ -200,7 +228,6 @@ public class GoogleMap : MonoBehaviour
         // 드래그를 시작하면 목적지가 검색된 시점의 gps를 기준으로 폴리라인을 그림
         if (!_isGPSOn)
         {
-            //Debug.Log("목적지 O + 드래그 O");
             directionsUrl = "https://maps.googleapis.com/maps/api/directions/json?origin=" + _dragInitGPSLat + "," + _dragInitGPSLon +
                                     "&destination=" + _destinationLat + "," + _destinationLon +
                                     "&region=KR" +
@@ -216,8 +243,6 @@ public class GoogleMap : MonoBehaviour
                                     "&mode=transit" +
                                     "&key=" + directionsApiKey;
         }
-
-        //Debug.Log(directionsUrl);
 
         UnityWebRequest www = UnityWebRequest.Get(directionsUrl);
         yield return www.SendWebRequest();
@@ -305,14 +330,10 @@ public class GoogleMap : MonoBehaviour
             float touchDeltaMag = (curTouch1Pos - curTouch2Pos).magnitude;
             float deltaMagnitudeDiff = prevTouchDeltaMag - touchDeltaMag;
 
-            //Debug.Log("deltaMagnitudeDiff : " + deltaMagnitudeDiff);
-
             float newZoom = _zoomLast - deltaMagnitudeDiff * _zoomSpeed;
             int newIntZoom = Mathf.RoundToInt(newZoom);
 
-            //newZoom = newZoom > 20 ? 20 : newZoom < 0 ? 0 : newZoom;
-            _zoom = Math.Clamp(newIntZoom, 0, 20);
-            //Debug.Log("newZoom : " + zoom);
+            _zoom = Math.Clamp(newIntZoom, _minZoom, _maxZoom);
 
             int zoomScale = _zoom - _zoomLast;
 
@@ -330,7 +351,7 @@ public class GoogleMap : MonoBehaviour
     private void Draging()
     {
         // 입력한 터치값이 1개 일 때
-        if (Input.touchCount == 1)
+        if (Input.touchCount == 1 && !_isGPSButtonClick)
         {
             if (!_isDraging)
             {
@@ -340,19 +361,17 @@ public class GoogleMap : MonoBehaviour
                 _isGPSOn = false;
             }
 
+            Debug.Log("Zoom : " + _zoom);
+            Debug.Log("DragSpeed : " + _dragSpeed);
+
             Vector2 curTouchPos = Input.GetTouch(0).position;
 
             float horiziontalTouchDelta = (_dragStartPos.x - curTouchPos.x);
             float verticalTouchDelta = (_dragStartPos.y - curTouchPos.y);
-            //Debug.Log("horiziontalTouchDelta : " + horiziontalTouchDelta + "\nverticalTouchDelta :" + verticalTouchDelta);
-
-            
 
             // 좌우로 swipe 했다면
             if (Mathf.Abs(horiziontalTouchDelta * _dragSpeed) > 0f)
             {
-                //if (zoom >= 10)
-                //    horiziontalTouchDelta = horiziontalTouchDelta > 0 ? 0.0065f/2f : -0.0065f/2f;
                 Vector2 newpos = new Vector2(-horiziontalTouchDelta, 0);
                 _marker.rectTransform.anchoredPosition += newpos;
                 _gpsLon = _gpsLon + horiziontalTouchDelta * _dragSpeed;
@@ -361,41 +380,18 @@ public class GoogleMap : MonoBehaviour
             // 위아래로 swipe 했다면
             if (Mathf.Abs(verticalTouchDelta * _dragSpeed) > 0f)
             {
-                //if (zoom >= 10)
-                //    verticalTouchDelta = verticalTouchDelta > 0 ? 0.0058f/2f : -0.0058f/2f;
                 Vector2 newpos = new Vector2(0, -verticalTouchDelta);
                 _marker.rectTransform.anchoredPosition += newpos;
                 _gpsLat = _gpsLat + verticalTouchDelta * _dragSpeed;
             }
 
             _dragStartPos = curTouchPos;
-
-            //Debug.Log("Draging Lat : " + _dragLat + ", Draging Lot : " + _dragLon);
         }
         // 터치값이 1개가 아닐 때
         else
         {
             _isDraging = false;
         }
-    }
-
-    private Vector2 ConvertGPStoXY(float lat, float lon, float mapLat, float mapLon, float mapWidth, float mapHeight)
-    {
-        // Calculate the distance between the user and the map center
-        float dx = (lon - mapLon) * Mathf.Deg2Rad * 6371000 * Mathf.Cos(lat * Mathf.Deg2Rad);
-        float dy = (lat - mapLat) * Mathf.Deg2Rad * 6371000;
-
-        // Calculate the x and y position of the user on the map
-        float x = ((dx / mapWidth) + 0.5f) * mapWidth;
-        float y = ((dy / mapHeight) + 0.5f) * mapHeight;
-
-        return new Vector2(x, y);
-    }
-
-    public void OnGPSWork()
-    {
-        _isGPSOn = true;
-        _marker.rectTransform.anchoredPosition = _markerInitPos;
     }
 
     public void OnSetOnDestination()
@@ -406,7 +402,12 @@ public class GoogleMap : MonoBehaviour
 
         _dragInitGPSLat = _gpsLat;
         _dragInitGPSLon = _gpsLon;
+
+        // 마커 위치를 목적지에 설정
+        //_markerLat = 37.71275f;
+        //_markerLon = 126.7615f;
     }
+
     public void OnSetOffDestination()
     {
         // 목적지 초기화
@@ -415,5 +416,10 @@ public class GoogleMap : MonoBehaviour
 
         _dragInitGPSLat = 0f;
         _dragInitGPSLon = 0f;
+    }
+
+    public void OnSearchButton()
+    {
+        //_destinationPos = "&markers=" + "color:" + GoogleMapColor.purple + "|" + _markerLat + "," + _markerLon;
     }
 }
