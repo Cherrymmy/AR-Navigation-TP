@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 
-public class MiniMapRenderer : MonoBehaviour, IStaticMapObserver
+public class MiniMapRenderer : MonoBehaviour, IDirectionMapObserver
 {
     // url 데이터
     [SerializeField] private string _apiKey;
@@ -23,25 +23,26 @@ public class MiniMapRenderer : MonoBehaviour, IStaticMapObserver
     private Rect _rect;
 
 
-    public void UpdateData(float lat, float lon, int zoom)
+    public void UpdateData(float gpslat, float gpslon, float deslat, float deslon, int zoom)
     {
-        _gpsLat = lat;
-        _gpsLon = lon;
+        _gpsLat = gpslat;
+        _gpsLon = gpslon;
         _zoom = zoom;
-        //Debug.Log("UpdateData");
+
         StartCoroutine(GetGoogleStaticMap());
     }
+
 
     private void OnEnable() 
     {
         _mapData = GameObject.Find("GoogleMap").GetComponent<GoogleMap>();
 
-        _mapData.ResisterStaticMapObserver(this);
+        _mapData.RemoveDirectionMapObserver(this);
     }
 
     private void OnDisable()
     {
-        _mapData.RemoveStaticMapObserver(this);
+        _mapData.RemoveDirectionMapObserver(this);
     }
 
     // Start is called before the first frame update
@@ -91,4 +92,5 @@ public class MiniMapRenderer : MonoBehaviour, IStaticMapObserver
         // 코루틴 종료
         yield break;
     }
+
 }

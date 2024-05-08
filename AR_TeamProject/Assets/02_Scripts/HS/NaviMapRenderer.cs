@@ -35,14 +35,13 @@ public class NaviMapRenderer : MonoBehaviour, IDirectionMapObserver
 
         if(!_mapData.IsGPSOn)
         {
-            _dragInitGPSLat = deslat;
-            _dragInitGPSLon = deslon;
+            _dragInitGPSLat = gpslat;
+            _dragInitGPSLon = gpslon;
         }
-        else
-        {
-            _destinationLat = deslat;
-            _destinationLon = deslon;
-        }
+
+
+        _destinationLat = deslat;
+        _destinationLon = deslon;
 
         _zoom = zoom;
 
@@ -99,7 +98,7 @@ public class NaviMapRenderer : MonoBehaviour, IDirectionMapObserver
             GetComponent<RawImage>().texture = ((DownloadHandlerTexture)www.downloadHandler).texture;
         }
 
-        // 코루틴 종료
+        // 코루틴 종료 
         yield break;
     }
 
