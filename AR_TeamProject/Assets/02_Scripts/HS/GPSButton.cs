@@ -19,6 +19,8 @@ public class GPSButton : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         _googleMap.IsGPSOn = true;
         _googleMap.markerPosition = _googleMap.markerInitPosition;
         _googleMap.IsGPSButtonClick = true;
+        _googleMap.DragInitGPSLat = 0f;
+        _googleMap.DragInitGPSLon = 0f;
     }
 
     public void OnPointerUp(PointerEventData eventData)

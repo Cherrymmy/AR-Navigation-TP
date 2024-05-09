@@ -23,7 +23,7 @@ public class MiniMapRenderer : MonoBehaviour, IDirectionMapObserver
     private Rect _rect;
 
 
-    public void UpdateData(float gpslat, float gpslon, float deslat, float deslon, int zoom)
+    public void UpdateData(float gpslat, float gpslon, float deslat, float deslon, float draglat, float draglon, int zoom)
     {
         _gpsLat = gpslat;
         _gpsLon = gpslon;

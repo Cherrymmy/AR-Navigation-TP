@@ -16,8 +16,21 @@ public class NaviMapRenderer : MonoBehaviour, IDirectionMapObserver
     private float _gpsLon;
     private float _destinationLat;
     private float _destinationLon;
-    private float _dragInitGPSLat;
-    private float _dragInitGPSLon;
+
+    public float OriginLat
+    {
+        get => _originLat;
+        set => _originLat = value;
+    }
+
+    public float OriginLon
+    {
+        get => _originLon;
+        set => _originLon = value;
+    }
+
+    private float _originLat;
+    private float _originLon;
     private int _zoom = 14;
     private int _mapWidth;
     private int _mapHeight;
@@ -28,17 +41,23 @@ public class NaviMapRenderer : MonoBehaviour, IDirectionMapObserver
     // Component
     private Rect _rect;
 
-    public void UpdateData(float gpslat, float gpslon, float deslat, float deslon, int zoom)
+    public void UpdateData(float gpslat, float gpslon, float deslat, float deslon, float draglat, float draglon, int zoom)
     {
-        _gpsLat = gpslat;
-        _gpsLon = gpslon;
-
-        if(!_mapData.IsGPSOn)
+        if (_mapData.IsGPSOn)
         {
-            _dragInitGPSLat = gpslat;
-            _dragInitGPSLon = gpslon;
+            _gpsLat = gpslat;
+            _gpsLon = gpslon;
         }
-
+        else
+        {
+            Debug.Log("drag lat" + draglat + "," + "drag lon" + draglon);
+            if(!(Mathf.Approximately(draglat, 0f) && Mathf.Approximately(draglon, 0f)))
+            {
+                _gpsLat = draglat;
+                _gpsLon = draglon;
+            }
+        }
+        
 
         _destinationLat = deslat;
         _destinationLon = deslon;
@@ -60,7 +79,6 @@ public class NaviMapRenderer : MonoBehaviour, IDirectionMapObserver
         _mapData.ResisterDirectionMapObserver(this);
     }
 
-    // Start is called before the first frame update
     void Start()
     {
         _rect = GetComponent<RawImage>().rectTransform.rect;
@@ -69,6 +87,7 @@ public class NaviMapRenderer : MonoBehaviour, IDirectionMapObserver
 
         StartCoroutine(GetGoogleStaticMap());
     }
+
     IEnumerator GetGoogleStaticMap(string path = "")
     {
         _rect = GetComponent<RawImage>().rectTransform.rect;
@@ -109,7 +128,7 @@ public class NaviMapRenderer : MonoBehaviour, IDirectionMapObserver
         // 드래그를 시작하면 목적지가 검색된 시점의 gps를 기준으로 폴리라인을 그림
         if (!_mapData.IsGPSOn)
         {
-            directionsUrl = "https://maps.googleapis.com/maps/api/directions/json?origin=" + _dragInitGPSLat + "," + _dragInitGPSLon +
+            directionsUrl = "https://maps.googleapis.com/maps/api/directions/json?origin=" + _originLat + "," + _originLon +
                                                                                          "&destination=" + _destinationLat + "," + _destinationLon +
                                                                                          "&region=KR" +
                                                                                          "&mode=transit" +
@@ -188,4 +207,6 @@ public class NaviMapRenderer : MonoBehaviour, IDirectionMapObserver
             }
         }
     }
+
+
 }

@@ -36,7 +36,7 @@ public class GoogleMap : MonoBehaviour, ISubject
     private int _zoom = 14;
     public int ZoomLast { get => _zoomLast; }
     private int _zoomLast = 14;
-    private resolution mapResolutionLast = resolution.low;
+    private resolution _mapResolutionLast = resolution.low;
     private type _mapTypeLast = type.roadmap;
     public bool UpdateMap
     {
@@ -71,6 +71,11 @@ public class GoogleMap : MonoBehaviour, ISubject
 
     private bool _isGPSOn = true;
     private bool _isPinching;
+    public bool IsDraging
+    {
+        get => _isDraging;
+    }
+
     private bool _isDraging;
     private bool _isGPSButtonClick;
     
@@ -106,6 +111,18 @@ public class GoogleMap : MonoBehaviour, ISubject
 
     // PolyLine
     public string directionsApiKey; // Directions API용 API 키
+    public float DragInitGPSLat
+    {
+        get => _dragInitGPSLat;
+        set => _dragInitGPSLat = value;
+    }
+
+    public float DragInitGPSLon
+    {
+        get => _dragInitGPSLon;
+        set => _dragInitGPSLon = value;
+    }
+
     private float _dragInitGPSLat;
     private float _dragInitGPSLon;
 
@@ -167,17 +184,6 @@ public class GoogleMap : MonoBehaviour, ISubject
                 _gpsLat = GPSManager.GetComponent<GPS>().latitude;
                 _gpsLon = GPSManager.GetComponent<GPS>().longitude;
 
-                //if(!_isSetDestination)
-                //{
-                //    _markerLat = _gpsLat;
-                //    _markerLon = _gpsLon;
-                //}
-                //else
-                //{
-                //    _gpsLat = _markerLat;
-                //    _gpsLon = _markerLon;
-                //}
-
                 // gps가 초기화 되기 전에 막기 위한 변수
                 // gpsLat, gpsLon이 0, 0 이면 true를 반환
                 _isGPSWorked = (Mathf.Approximately(_gpsLat, 0f) && Mathf.Approximately(_gpsLon, 0f));
@@ -188,7 +194,7 @@ public class GoogleMap : MonoBehaviour, ISubject
     private void Update()
     {
         if (_updateMap && (apiKeyLast != apiKey || Mathf.Approximately(_latLast, /*lat*/_gpsLat) || Mathf.Approximately(_lonLast, /*lon*/_gpsLon) ||
-                        /*zoomLast != zoom ||*/ mapResolutionLast != _mapResolution || _mapTypeLast != _maptype || !_isGPSWorked))
+                        /*zoomLast != zoom ||*/ _mapResolutionLast != _mapResolution || _mapTypeLast != _maptype || !_isGPSWorked))
         {
             // zoom in & out
             ZoomInAndOut();
@@ -250,7 +256,7 @@ public class GoogleMap : MonoBehaviour, ISubject
             _latLast = _gpsLat;
             _lonLast = _gpsLon;
             _zoomLast = _zoom;
-            mapResolutionLast = _mapResolution;
+            _mapResolutionLast = _mapResolution;
             _mapTypeLast = _maptype;
             _updateMap = true;
         }
@@ -413,6 +419,7 @@ public class GoogleMap : MonoBehaviour, ISubject
                 Vector2 newpos = new Vector2(-horiziontalTouchDelta, 0);
                 _marker.rectTransform.anchoredPosition += newpos;
                 _gpsLon = _gpsLon + horiziontalTouchDelta * _dragSpeed;
+                _dragInitGPSLon = _gpsLon;
             }
 
             // 위아래로 swipe 했다면
@@ -421,6 +428,7 @@ public class GoogleMap : MonoBehaviour, ISubject
                 Vector2 newpos = new Vector2(0, -verticalTouchDelta);
                 _marker.rectTransform.anchoredPosition += newpos;
                 _gpsLat = _gpsLat + verticalTouchDelta * _dragSpeed;
+                _dragInitGPSLat = _gpsLat;
             }
 
             DetailMapRenderer detailMapRenderer = _detailMapCanvas.transform.GetComponentInChildren<DetailMapRenderer>();
@@ -514,13 +522,23 @@ public class GoogleMap : MonoBehaviour, ISubject
 
     public void OnDrawPathButton()
     {
+        _detailMapCanvas.enabled = false;
+        _naviMapCanvas.enabled = true;
+
         // 목적지맵 외 에서는 드래그, 줌인아웃 열기
         _isDetailMapOpen = false;
 
-        _detailMapCanvas.enabled = false;
-        _naviMapCanvas.enabled = true;
+        // 경로 탐색 시작한 지점 초기화
+        NaviMapRenderer naviMapRenderer = _naviMapCanvas.GetComponentInChildren<NaviMapRenderer>();
+
+        if (naviMapRenderer != null)
+        {
+            naviMapRenderer.OriginLat = _gpsLat;
+            naviMapRenderer.OriginLon = _gpsLon;
+        }
     }
 
+    #region 옵저버패턴
     /// <summary>
     /// staticMap/DirectionMap Resister
     /// </summary>
@@ -557,7 +575,7 @@ public class GoogleMap : MonoBehaviour, ISubject
     {
         foreach(IDirectionMapObserver observer in _directionMapObserver)
         {
-            observer.UpdateData(_gpsLat, _gpsLon, _destinationLat, _destinationLon, _zoom);
+            observer.UpdateData(_gpsLat, _gpsLon, _destinationLat, _destinationLon, _dragInitGPSLat, _dragInitGPSLon, _zoom);
         }
     }
 
@@ -572,4 +590,5 @@ public class GoogleMap : MonoBehaviour, ISubject
         // Update DirectionMap Data
         NotifyDirectionMapObservers();
     }
+    #endregion
 }
