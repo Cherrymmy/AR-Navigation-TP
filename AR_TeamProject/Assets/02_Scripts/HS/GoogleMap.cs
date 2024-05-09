@@ -131,11 +131,11 @@ public class GoogleMap : MonoBehaviour, ISubject
     private float _destinationLon;
 
     // Canvas
-    private bool _isDetailMapOpen;
+    private bool _isDragZoomDisable;
     private Canvas _staticMapCanvas;
     private Canvas _detailMapCanvas;
     private Canvas _naviMapCanvas;
-    private GameObject _miniMapCanvas;
+    private Canvas _miniMapCanvas;
 
     // ObserverPattern
     private List<IStaticMapObserver> _staticMapObserver = new List<IStaticMapObserver>();
@@ -157,7 +157,6 @@ public class GoogleMap : MonoBehaviour, ISubject
 
     private void Start()
     {
-     
         GPSManager = GameObject.Find("GPSManager");
         _marker = GameObject.Find("Image - Marker").GetComponent<Image>();
         _markerInitPos = _marker.rectTransform.anchoredPosition;
@@ -165,9 +164,11 @@ public class GoogleMap : MonoBehaviour, ISubject
         _staticMapCanvas = GameObject.Find("Canvas - StaticMap").GetComponent<Canvas>();
         _detailMapCanvas = GameObject.Find("Canvas - DetailMap").GetComponent<Canvas>();
         _naviMapCanvas = GameObject.Find("Canvas - NaviMap").GetComponent<Canvas>();
+        _miniMapCanvas = GameObject.Find("Canvas - MiniMap").GetComponent<Canvas>();
 
         _detailMapCanvas.enabled = false;
         _naviMapCanvas.enabled = false;
+        _miniMapCanvas.enabled = false;
 
         //StartCoroutine(GetGoogleMap());
         //rect = gameObject.GetComponent<RawImage>().rectTransform.rect;
@@ -357,7 +358,7 @@ public class GoogleMap : MonoBehaviour, ISubject
     private void ZoomInAndOut()
     {
         // zoom in & out
-        if (Input.touchCount == 2 && !_isDetailMapOpen)
+        if (Input.touchCount == 2 && !_isDragZoomDisable)
         {
             if (!_isPinching)
             {
@@ -395,7 +396,7 @@ public class GoogleMap : MonoBehaviour, ISubject
     private void Draging()
     {
         // 입력한 터치값이 1개 일 때
-        if (Input.touchCount == 1 && !_isGPSButtonClick && !_isDetailMapOpen)
+        if (Input.touchCount == 1 && !_isGPSButtonClick && !_isDragZoomDisable)
         {
             if (!_isDraging)
             {
@@ -496,7 +497,7 @@ public class GoogleMap : MonoBehaviour, ISubject
         }
 
         // 목적지맵에서는 드래그, 줌인아웃 막기
-        _isDetailMapOpen = true;
+        _isDragZoomDisable = true;
     }
 
     public void OntestButton()
@@ -517,7 +518,7 @@ public class GoogleMap : MonoBehaviour, ISubject
         }
 
         // 목적지맵 외 에서는 드래그, 줌인아웃 열기
-        _isDetailMapOpen = false;
+        _isDragZoomDisable = false;
     }
 
     public void OnDrawPathButton()
@@ -526,7 +527,7 @@ public class GoogleMap : MonoBehaviour, ISubject
         _naviMapCanvas.enabled = true;
 
         // 목적지맵 외 에서는 드래그, 줌인아웃 열기
-        _isDetailMapOpen = false;
+        _isDragZoomDisable = false;
 
         // 경로 탐색 시작한 지점 초기화
         NaviMapRenderer naviMapRenderer = _naviMapCanvas.GetComponentInChildren<NaviMapRenderer>();
@@ -536,6 +537,14 @@ public class GoogleMap : MonoBehaviour, ISubject
             naviMapRenderer.OriginLat = _gpsLat;
             naviMapRenderer.OriginLon = _gpsLon;
         }
+    }
+
+    public void OnShowMiniMapButton()
+    {
+        _naviMapCanvas.enabled = false;
+        _miniMapCanvas.enabled = true;
+
+        _isDragZoomDisable = true;
     }
 
     #region 옵저버패턴

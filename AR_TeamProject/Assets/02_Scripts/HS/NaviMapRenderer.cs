@@ -57,7 +57,6 @@ public class NaviMapRenderer : MonoBehaviour, IDirectionMapObserver
                 _gpsLon = draglon;
             }
         }
-        
 
         _destinationLat = deslat;
         _destinationLon = deslon;
@@ -99,8 +98,10 @@ public class NaviMapRenderer : MonoBehaviour, IDirectionMapObserver
                                                                                "&size=" + _mapWidth + "x" + _mapHeight +
                                                                                "&scale=" + _mapData.MapResolution +
                                                                                "&maptype=" + _mapData.MapType +
-                                                                               "&key=" + _apiKey
-                                                                               + path;
+                                                                               "&key=" + _apiKey +
+                                                                               "&markers=" + "color:" + GoogleMap.GoogleMapColor.green + "|" + _destinationLat + "," + _destinationLon +
+                                                                               "&markers=" + "color:" + GoogleMap.GoogleMapColor.red + "|" + _originLat + "," + _originLon +
+                                                                               path;
 
 
         UnityWebRequest www = UnityWebRequestTexture.GetTexture(_url);
