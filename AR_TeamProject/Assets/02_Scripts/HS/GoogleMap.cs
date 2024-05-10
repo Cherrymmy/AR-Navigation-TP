@@ -214,7 +214,12 @@ public class GoogleMap : MonoBehaviour, ISubject
             //else
             //StartCoroutine(GetDirections());
             UpdateStaticMap();
-            UpdateDirectionMap();
+
+            // 목적지가 있을 때만 갱신해줌
+            if(!(Mathf.Approximately(_destinationLat, 0f) && Mathf.Approximately(_destinationLon, 0f)))
+            {
+                UpdateDirectionMap();
+            }
 
             _latLast = _gpsLat;
             _lonLast = _gpsLon;
