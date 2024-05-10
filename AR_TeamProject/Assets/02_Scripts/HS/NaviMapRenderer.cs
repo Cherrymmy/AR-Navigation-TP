@@ -31,7 +31,7 @@ public class NaviMapRenderer : MonoBehaviour, IDirectionMapObserver
 
     private float _originLat;
     private float _originLon;
-    private int _zoom = 14;
+    private int _zoom = 12;
     private int _mapWidth;
     private int _mapHeight;
 
@@ -208,6 +208,4 @@ public class NaviMapRenderer : MonoBehaviour, IDirectionMapObserver
             }
         }
     }
-
-
 }
