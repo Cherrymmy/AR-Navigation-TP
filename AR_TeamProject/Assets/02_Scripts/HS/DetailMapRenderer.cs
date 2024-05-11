@@ -53,7 +53,7 @@ public class DetailMapRenderer : MonoBehaviour, IDirectionMapObserver
         StartCoroutine(GetGoogleStaticMap());
     }
 
-    public void UpdateData(float lat, float lon, float deslat, float deslon, float draglat, float draglon, int zoom)
+    public void UpdateData(float lat, float lon, float deslat, float deslon, float draglat, float draglon, int zoom, Vector2 markerPos)
     {
         _desLat = deslat;
         _desLon = deslon;

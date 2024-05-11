@@ -95,6 +95,8 @@ public class GoogleMap : MonoBehaviour, ISubject
     private Vector2 _dragStartPos;
 
     // Marker
+    private Vector2 _markerPos;
+
     public Vector2 markerPosition
     {
         get => _marker.rectTransform.anchoredPosition;
@@ -158,10 +160,12 @@ public class GoogleMap : MonoBehaviour, ISubject
     private void Start()
     {
         GPSManager = GameObject.Find("GPSManager");
-        _marker = GameObject.Find("Image - Marker").GetComponent<Image>();
-        _markerInitPos = _marker.rectTransform.anchoredPosition;
+        //_marker = GameObject.Find("Image - Marker").GetComponent<Image>();
+        //_markerInitPos = _marker.rectTransform.anchoredPosition;
 
         _staticMapCanvas = GameObject.Find("Canvas - StaticMap").GetComponent<Canvas>();
+        _markerInitPos = _staticMapCanvas.GetComponentInChildren<StaticMapRenderer>().markerInitPosition;
+
         _detailMapCanvas = GameObject.Find("Canvas - DetailMap").GetComponent<Canvas>();
         _naviMapCanvas = GameObject.Find("Canvas - NaviMap").GetComponent<Canvas>();
         _miniMapCanvas = GameObject.Find("Canvas - MiniMap").GetComponent<Canvas>();
@@ -423,7 +427,8 @@ public class GoogleMap : MonoBehaviour, ISubject
             if (Mathf.Abs(horiziontalTouchDelta * _dragSpeed) > 0f)
             {
                 Vector2 newpos = new Vector2(-horiziontalTouchDelta, 0);
-                _marker.rectTransform.anchoredPosition += newpos;
+                _markerPos.x = newpos.x;
+                //_marker.rectTransform.anchoredPosition += newpos;
                 _gpsLon = _gpsLon + horiziontalTouchDelta * _dragSpeed;
                 _dragInitGPSLon = _gpsLon;
             }
@@ -432,7 +437,8 @@ public class GoogleMap : MonoBehaviour, ISubject
             if (Mathf.Abs(verticalTouchDelta * _dragSpeed) > 0f)
             {
                 Vector2 newpos = new Vector2(0, -verticalTouchDelta);
-                _marker.rectTransform.anchoredPosition += newpos;
+                _markerPos.y = newpos.y;
+                //_marker.rectTransform.anchoredPosition += newpos;
                 _gpsLat = _gpsLat + verticalTouchDelta * _dragSpeed;
                 _dragInitGPSLat = _gpsLat;
             }
@@ -581,7 +587,7 @@ public class GoogleMap : MonoBehaviour, ISubject
     {
         foreach(IStaticMapObserver observer in _staticMapObserver)
         {
-            observer.UpdateData(_gpsLat, _gpsLon, _zoom);
+            observer.UpdateData(_gpsLat, _gpsLon, _zoom, _markerPos);
         }
     }
 
@@ -589,7 +595,7 @@ public class GoogleMap : MonoBehaviour, ISubject
     {
         foreach(IDirectionMapObserver observer in _directionMapObserver)
         {
-            observer.UpdateData(_gpsLat, _gpsLon, _destinationLat, _destinationLon, _dragInitGPSLat, _dragInitGPSLon, _zoom);
+            observer.UpdateData(_gpsLat, _gpsLon, _destinationLat, _destinationLon, _dragInitGPSLat, _dragInitGPSLon, _zoom, _markerPos);
         }
     }
 

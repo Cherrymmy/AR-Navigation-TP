@@ -26,13 +26,12 @@ public class MiniMapRenderer : MonoBehaviour, IDirectionMapObserver
     private Rect _rect;
 
 
-    public void UpdateData(float gpslat, float gpslon, float deslat, float deslon, float draglat, float draglon, int zoom)
+    public void UpdateData(float gpslat, float gpslon, float deslat, float deslon, float draglat, float draglon, int zoom, Vector2 markerPos)
     {
         _gpsLat = gpslat;
         _gpsLon = gpslon;
         _destinationLat = deslat;
         _destinationLon = deslon;
-        Debug.Log("destination lat : " + _destinationLat + "destination lon : " + _destinationLon);
 
         StartCoroutine(GetDirectionsMap());
     }

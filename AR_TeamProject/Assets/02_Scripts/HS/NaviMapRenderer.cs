@@ -35,13 +35,29 @@ public class NaviMapRenderer : MonoBehaviour, IDirectionMapObserver
     private int _mapWidth;
     private int _mapHeight;
 
+    // marker
+    private Image _marker;
+    public Vector2 markerInitPosition
+    {
+        get => _markerInitPos;
+    }
+
+    public Vector2 markerPosition
+    {
+        get => _marker.rectTransform.anchoredPosition;
+        set => _marker.rectTransform.anchoredPosition = value;
+    }
+
+    private Vector2 _markerInitPos;
+
     // Data
     private GoogleMap _mapData;
 
     // Component
     private Rect _rect;
 
-    public void UpdateData(float gpslat, float gpslon, float deslat, float deslon, float draglat, float draglon, int zoom)
+
+    public void UpdateData(float gpslat, float gpslon, float deslat, float deslon, float draglat, float draglon, int zoom, Vector2 markerPos)
     {
         if (_mapData.IsGPSOn)
         {
@@ -50,13 +66,15 @@ public class NaviMapRenderer : MonoBehaviour, IDirectionMapObserver
         }
         else
         {
-            Debug.Log("drag lat" + draglat + "," + "drag lon" + draglon);
             if(!(Mathf.Approximately(draglat, 0f) && Mathf.Approximately(draglon, 0f)))
             {
                 _gpsLat = draglat;
                 _gpsLon = draglon;
             }
         }
+
+        if (_mapData.IsDraging)
+            _marker.rectTransform.anchoredPosition += markerPos;
 
         _destinationLat = deslat;
         _destinationLon = deslon;
@@ -80,6 +98,9 @@ public class NaviMapRenderer : MonoBehaviour, IDirectionMapObserver
 
     void Start()
     {
+        _marker = transform.Find("Image - Marker").GetComponent<Image>();
+        _markerInitPos = _marker.rectTransform.anchoredPosition;
+
         _rect = GetComponent<RawImage>().rectTransform.rect;
         _mapWidth = (int)Math.Round(_rect.width);
         _mapHeight = (int)Math.Round(_rect.height);

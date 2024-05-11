@@ -16,6 +16,23 @@ public class StaticMapRenderer : MonoBehaviour, IStaticMapObserver
     private int _mapWidth;
     private int _mapHeight;
 
+    // marker
+    private Image _marker;
+
+    public Vector2 markerInitPosition
+    {
+        get => _markerInitPos;
+    }
+
+    public Vector2 markerPosition
+    {
+        get => _marker.rectTransform.anchoredPosition;
+        set => _marker.rectTransform.anchoredPosition = value;
+    }
+
+    private Vector2 _markerInitPos;
+
+
     // Data
     private GoogleMap _mapData;
 
@@ -23,12 +40,14 @@ public class StaticMapRenderer : MonoBehaviour, IStaticMapObserver
     private Rect _rect;
 
 
-    public void UpdateData(float lat, float lon, int zoom)
+    public void UpdateData(float lat, float lon, int zoom, Vector2 markerPos)
     {
         _gpsLat = lat;
         _gpsLon = lon;
         _zoom = zoom;
-        //Debug.Log("UpdateData");
+        
+        if(_mapData.IsDraging)
+            _marker.rectTransform.anchoredPosition += markerPos;
 
         StartCoroutine(GetGoogleStaticMap());
     }
@@ -48,6 +67,9 @@ public class StaticMapRenderer : MonoBehaviour, IStaticMapObserver
     // Start is called before the first frame update
     void Start()
     {
+        _marker = transform.Find("Image - Marker").GetComponent<Image>();
+        _markerInitPos = _marker.rectTransform.anchoredPosition;
+
         _rect = GetComponent<RawImage>().rectTransform.rect;
         _mapWidth = (int)Math.Round(_rect.width);
         _mapHeight = (int)Math.Round(_rect.height);
