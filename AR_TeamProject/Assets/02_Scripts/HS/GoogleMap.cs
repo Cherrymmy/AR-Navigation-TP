@@ -49,6 +49,16 @@ public class GoogleMap : MonoBehaviour, ISubject
 
     // GPS
     private bool _isGPSWorked;
+    public float GpsLat
+    {
+        get => _gpsLat;
+    }
+
+    public float GpsLon
+    {
+        get => _gpsLon;
+    }
+
     private float _gpsLat;
     private float _gpsLon;
 
@@ -145,6 +155,12 @@ public class GoogleMap : MonoBehaviour, ISubject
     private float _destinationLon;
 
     // Canvas
+    public bool IsDragZoomDisable
+    {
+        get => _isDragZoomDisable;
+        set => _isDragZoomDisable = value;
+    }
+
     private bool _isDragZoomDisable;
     private Canvas _staticMapCanvas;
     private Canvas _detailMapCanvas;

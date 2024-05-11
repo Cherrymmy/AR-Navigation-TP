@@ -9,6 +9,9 @@ EditorBuildSettings:
     path: Assets/01_Scenes/CL/LoadingScene.unity
     guid: 6e50fa4139c16d14a92e340e587a8084
   - enabled: 1
+    path: Assets/01_Scenes/HS/UIScenes - HS.unity
+    guid: 2a6e42e553151e948a87450ff3f1d5ed
+  - enabled: 0
     path: Assets/01_Scenes/KD/UIScenes.unity
     guid: 6b88b7f2c11310c42a93f57a41d3d90d
   - enabled: 1

@@ -65,6 +65,7 @@ namespace AR
 
         private IEnumerator PlaceDetails(string url)
         {
+
             using (UnityWebRequest request = UnityWebRequest.Get(url))
             {
                 yield return request.SendWebRequest();
@@ -77,6 +78,7 @@ namespace AR
                 {
                     Debug.Log("응답: " + request.downloadHandler.text);
                     placeDetailsResponse = JsonUtility.FromJson<PlaceDetailsResponse>(request.downloadHandler.text);
+                    NaviSet();
                     StartCoroutine(LoadImageFromPhoto(placeDetailsResponse.result.photos[0], OnImageLoaded));
                 }
             }
@@ -122,10 +124,25 @@ namespace AR
             Application.OpenURL(url);
         }
 
-        public void NaviSet()
+        private void NaviSet()
         {
             googleMap.DestinationLat = placeDetailsResponse.result.geometry.location.lat;
             googleMap.DestinationLon = placeDetailsResponse.result.geometry.location.lng;
+            googleMap.IsDragZoomDisable = true;
+        }
+
+        public void OnDragAbleButton()
+        {
+            googleMap.IsDragZoomDisable = false;
+
+            // 경로 탐색 시작한 지점 초기화
+            NaviMapRenderer naviMapRenderer = GameObject.Find("RawImage - NaviMap").GetComponent<NaviMapRenderer>();
+
+            if (naviMapRenderer != null)
+            {
+                naviMapRenderer.OriginLat = googleMap.GpsLat;
+                naviMapRenderer.OriginLon = googleMap.GpsLon;
+            }
         }
     }
 }

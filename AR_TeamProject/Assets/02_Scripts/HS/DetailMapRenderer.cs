@@ -58,11 +58,11 @@ public class DetailMapRenderer : MonoBehaviour, IDirectionMapObserver
         _desLat = deslat;
         _desLon = deslon;
         
-        if(_isDestinationSet)
-        {
+        //if(_isDestinationSet)
+        //{
             _markerLat = deslat;
             _markerLon = deslon;
-        }
+        //}
 
         StartCoroutine(GetGoogleStaticMap());
     }

@@ -21,7 +21,7 @@ namespace AR
             _view = FindAnyObjectByType<DetailView>();
             _model = FindAnyObjectByType<DetailModel>();
             _model.OnDetailSearchComplete.AddListener(ViewChange);
-            _view.nextButton.onClick.AddListener(_model.NaviSet);
+            _view.nextButton.onClick.AddListener(_model.OnDragAbleButton);
         }
 
         private void ViewChange()
