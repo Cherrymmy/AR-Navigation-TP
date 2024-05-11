@@ -8,6 +8,8 @@ using System.Collections;
 
 public class TouchManager : MonoBehaviour
 {
+    public Button petButton;
+
     [SerializeField] private GameObject placeObjectPrefab; // AR에 배치할 객체의 프리팹
     private GameObject placeObjectInstance; // 배치된 객체의 인스턴스
     private Animator placeObjectAnimator; // 배치된 객체의 애니메이터 컴포넌트
@@ -18,6 +20,7 @@ public class TouchManager : MonoBehaviour
     private Image balloonImage; // UI 말풍선 이미지
     private TextMeshProUGUI balloonText; // 말풍선 내의 텍스트 컴포넌트
     private Coroutine balloonCoroutine;
+    private bool petActive = false;
 
     // 랜덤 텍스트 
     private string[] randomMessages = new string[]
@@ -37,6 +40,8 @@ public class TouchManager : MonoBehaviour
         {
             Debug.LogError("AR 관련 컴포넌트를 찾을 수 없습니다.");
         }
+
+        petButton.onClick.AddListener(PetManaging);
     }
 
     void Update()
@@ -58,6 +63,7 @@ public class TouchManager : MonoBehaviour
                         placeObjectInstance.AddComponent<BoxCollider>();
                         placeObjectAnimator = placeObjectInstance.GetComponent<Animator>();
                         SetupBalloonComponents();
+                        placeObjectInstance.SetActive(false);
                     }
                     else
                     {
@@ -73,6 +79,13 @@ public class TouchManager : MonoBehaviour
             Pose hitPose = raycastHits[0].pose;
             UpdateObjectPositionAndFollowUser(hitPose.position);
         }
+    }
+
+    public void PetManaging()
+    {
+        // 껐다 켰다
+        placeObjectInstance.SetActive(!petActive);
+        petActive = !petActive;
     }
 
     /// <summary>
@@ -135,6 +148,7 @@ public class TouchManager : MonoBehaviour
         placeObjectInstance.transform.position = Vector3.Lerp(placeObjectInstance.transform.position, newPosition, Time.deltaTime * 2);
 
         bool isMoving = Vector3.Distance(placeObjectInstance.transform.position, newPosition) > 0.05f;
+        // 0.05f 보다 크게 움직일때만 애니메이션 작동
         placeObjectAnimator.SetBool("isWalking", isMoving);
 
         Quaternion targetRotation = Quaternion.LookRotation(arCameraManager.transform.forward);
