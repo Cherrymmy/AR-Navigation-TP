@@ -8,6 +8,8 @@ using System.Collections;
 
 public class TouchManager : MonoBehaviour
 {
+    public Button petButton;
+
     [SerializeField] private GameObject placeObjectPrefab; // AR에 배치할 객체의 프리팹
     private GameObject placeObjectInstance; // 배치된 객체의 인스턴스
     private Animator placeObjectAnimator; // 배치된 객체의 애니메이터 컴포넌트
@@ -17,15 +19,17 @@ public class TouchManager : MonoBehaviour
 
     private Image balloonImage; // UI 말풍선 이미지
     private TextMeshProUGUI balloonText; // 말풍선 내의 텍스트 컴포넌트
-    private new ParticleSystem particleSystem;
     private Coroutine balloonCoroutine;
+    private bool petActive = false;
 
     // 랜덤 텍스트 
     private string[] randomMessages = new string[]
     {
-       "안녕하세요!",
+        "안녕하세요!",
         "저를 따라오세요!",
         "잘 오고있나요?",
+        "거의 다 왔어요!!",
+        "도착!"
     };
 
     void Start()
@@ -36,63 +40,57 @@ public class TouchManager : MonoBehaviour
         {
             Debug.LogError("AR 관련 컴포넌트를 찾을 수 없습니다.");
         }
+
+        petButton.onClick.AddListener(PetManaging);
     }
 
     void Update()
     {
         Vector2 screenCenter = new Vector2(Screen.width / 2, Screen.height / 2);
 
-        // 오브젝트가 존재하면 항상 위치를 업데이트
-        if (placeObjectInstance != null)
-        {
-            UpdateObjectMovement(screenCenter);
-        }
-
         if (Input.touchCount > 0)
         {
             Touch touch = Input.GetTouch(0);
             if (touch.phase == TouchPhase.Began)
             {
-                AttemptToPlaceObject(touch.position);
+                List<ARRaycastHit> hits = new List<ARRaycastHit>();
+                if (raycastManager.Raycast(touch.position, hits, TrackableType.PlaneWithinPolygon))
+                {
+                    Pose hitPose = hits[0].pose;
+                    if (placeObjectInstance == null)
+                    {
+                        placeObjectInstance = Instantiate(placeObjectPrefab, hitPose.position, Quaternion.identity);
+                        placeObjectInstance.AddComponent<BoxCollider>();
+                        placeObjectAnimator = placeObjectInstance.GetComponent<Animator>();
+                        SetupBalloonComponents();
+                        placeObjectInstance.SetActive(false);
+                    }
+                    else
+                    {
+                        placeObjectAnimator.SetTrigger("jump");
+                        ShowBalloon();
+                    }
+                }
             }
         }
-    }
 
-    void AttemptToPlaceObject(Vector2 touchPosition)
-    {
-        List<ARRaycastHit> hits = new List<ARRaycastHit>();
-        if (raycastManager.Raycast(touchPosition, hits, TrackableType.PlaneWithinPolygon))
-        {
-            Pose hitPose = hits[0].pose;
-            if (placeObjectInstance == null)
-            {
-                placeObjectInstance = Instantiate(placeObjectPrefab, hitPose.position, Quaternion.identity);
-                placeObjectInstance.AddComponent<BoxCollider>();
-                placeObjectAnimator = placeObjectInstance.GetComponent<Animator>();
-                SetupBalloonComponents();
-            }
-            else
-            {
-                placeObjectAnimator.SetTrigger("jump");
-                ShowBalloon();
-            }
-        }
-    }
-
-    void UpdateObjectMovement(Vector2 screenCenter)
-    {
-        if (raycastManager.Raycast(screenCenter, raycastHits, TrackableType.PlaneWithinPolygon))
+        if (placeObjectInstance != null && raycastManager.Raycast(screenCenter, raycastHits, TrackableType.PlaneWithinPolygon))
         {
             Pose hitPose = raycastHits[0].pose;
-            ARPlane plane = raycastHits[0].trackable as ARPlane;
-            if (plane != null)
-            {
-                UpdateObjectPositionAndFollowUser(hitPose.position, plane.center.y);
-            }
+            UpdateObjectPositionAndFollowUser(hitPose.position);
         }
     }
 
+    public void PetManaging()
+    {
+        // 껐다 켰다
+        placeObjectInstance.SetActive(!petActive);
+        petActive = !petActive;
+    }
 
+    /// <summary>
+    /// Canvas children 가져옴 
+    /// </summary>
     void SetupBalloonComponents()
     {
         Canvas canvas = placeObjectInstance.GetComponentInChildren<Canvas>(true);
@@ -102,7 +100,6 @@ public class TouchManager : MonoBehaviour
             canvas.worldCamera = Camera.main;
             balloonImage = canvas.GetComponentInChildren<Image>(true);
             balloonText = canvas.GetComponentInChildren<TextMeshProUGUI>(true);
-            particleSystem = canvas.GetComponentInChildren<ParticleSystem>(true);
         }
 
         if (balloonImage == null || balloonText == null)
@@ -112,15 +109,16 @@ public class TouchManager : MonoBehaviour
         }
 
         balloonImage.gameObject.SetActive(false); // 초기 상태는 비활성화
-        particleSystem.Stop();
     }
 
+    /// <summary>
+    /// 말풍선에 랜덤 텍스트 띄우고 3초 뒤 사라지게 함
+    /// </summary>
     void ShowBalloon()
     {
         int randomIndex = Random.Range(0, randomMessages.Length);
         balloonText.text = randomMessages[randomIndex];
         balloonImage.gameObject.SetActive(true);
-        particleSystem.Play(); // 파티클 시스템 활성화
 
         if (balloonCoroutine != null)
         {
@@ -133,43 +131,27 @@ public class TouchManager : MonoBehaviour
     {
         yield return new WaitForSeconds(seconds);
         balloonImage.gameObject.SetActive(false);
-        particleSystem.Stop(); // 파티클 시스템 비활성화
     }
 
-    void UpdateObjectPositionAndFollowUser(Vector3 targetPosition, float planeHeight)
+    /// <summary>
+    /// object가 사용자를 따라갈 때의 위치랑 방향조정하고 이동 여부로 애니메이션 상태 설정함
+    /// </summary>
+    /// <param name="targetPosition"></param>
+    void UpdateObjectPositionAndFollowUser(Vector3 targetPosition)
     {
-        if (raycastManager.Raycast(new Vector2(Screen.width / 2, Screen.height / 2), raycastHits, TrackableType.PlaneWithinPolygon))
+        if (!raycastManager.Raycast(new Vector2(Screen.width / 2, Screen.height / 2), raycastHits, TrackableType.PlaneWithinPolygon))
         {
-            ARRaycastHit hit = raycastHits[0];
-            Vector3 newPosition = new Vector3(targetPosition.x, hit.pose.position.y + 0.1f, targetPosition.z);
-
-            // 객체의 위치를 부드럽게 조정
-            placeObjectInstance.transform.position = Vector3.Lerp(placeObjectInstance.transform.position, newPosition, Time.deltaTime * 2);
-
-            // 스케일 조정
-            AdjustScaleBasedOnDistance(placeObjectInstance.transform.position, Camera.main.transform.position);
-
-            // 이동 여부에 따라 애니메이션 상태 업데이트
-            bool isMoving = Vector3.Distance(placeObjectInstance.transform.position, newPosition) > 0.05f;
-            placeObjectAnimator.SetBool("isWalking", isMoving);
-
-            Quaternion targetRotation = Quaternion.LookRotation(arCameraManager.transform.forward);
-            // placeObjectInstance의 회전을 현재 회전에서 targetRotation으로 시간에 따라 부드럽게 조정합니다.
-            placeObjectInstance.transform.rotation = Quaternion.Slerp(placeObjectInstance.transform.rotation, targetRotation, Time.deltaTime * 5);
-
+            return;
         }
-        else
-        {
-            // 평면 감지에 실패한 경우, 이동 및 회전 중지
-            placeObjectAnimator.SetBool("isWalking", false);
-        }
-    }
 
-    void AdjustScaleBasedOnDistance(Vector3 objectPosition, Vector3 cameraPosition)
-    {
-        float distance = Vector3.Distance(cameraPosition, objectPosition);
-        float scale = Mathf.Clamp(distance / 5.0f, 0.1f, 2.0f); // 거리에 따른 스케일 조정. '5.0f'는 조정 계수입니다.
-        placeObjectInstance.transform.localScale = new Vector3(scale, scale, scale);
-    }
+        Vector3 newPosition = new Vector3(targetPosition.x, targetPosition.y + 0.1f, targetPosition.z);
+        placeObjectInstance.transform.position = Vector3.Lerp(placeObjectInstance.transform.position, newPosition, Time.deltaTime * 2);
 
+        bool isMoving = Vector3.Distance(placeObjectInstance.transform.position, newPosition) > 0.05f;
+        // 0.05f 보다 크게 움직일때만 애니메이션 작동
+        placeObjectAnimator.SetBool("isWalking", isMoving);
+
+        Quaternion targetRotation = Quaternion.LookRotation(arCameraManager.transform.forward);
+        placeObjectInstance.transform.rotation = Quaternion.Slerp(placeObjectInstance.transform.rotation, targetRotation, Time.deltaTime * 5);
+    }
 }
