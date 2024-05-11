@@ -14,7 +14,7 @@ public class UIManager : MonoBehaviour
         Search_Canvas,
         Detail_Canvas,
         NaviMap_Canvas,
-        ARMap_Canvas
+        AR_Canvas
     }
 
     public static UIManager Instance { get; private set; }
