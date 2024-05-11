@@ -934,6 +934,7 @@ GameObject:
   - component: {fileID: 793509620}
   - component: {fileID: 793509619}
   - component: {fileID: 793509622}
+  - component: {fileID: 793509623}
   m_Layer: 0
   m_Name: XR Origin
   m_TagString: Untagged
@@ -986,8 +987,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e1760703bbd54c04488a8d10600262ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_PlanePrefab: {fileID: 0}
-  m_DetectionMode: -1
+  m_PlanePrefab: {fileID: 254277145073048071, guid: bf1057a8b2fd3ff47afb96769a2ca3b3, type: 3}
+  m_DetectionMode: 1
 --- !u!114 &793509620
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1027,6 +1028,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   petButton: {fileID: 360805262}
   placeObjectPrefab: {fileID: 3129504432866963690, guid: 46b9a623005df0644a0ed84769519e70, type: 3}
+--- !u!114 &793509623
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 793509616}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa17d122634046b4a8e23048891fafc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_RaycastPrefab: {fileID: 0}
 --- !u!1 &821294446
 GameObject:
   m_ObjectHideFlags: 0

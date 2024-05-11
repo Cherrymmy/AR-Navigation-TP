@@ -20,6 +20,8 @@ namespace AR
         public UnityEvent OnDetailSearchComplete;
         public Texture2D texture;
 
+        public GoogleMap googleMap;
+
 
         public void Toss(string name)
         {
@@ -118,6 +120,12 @@ namespace AR
             string url = "tel:" + phoneNumber;
 
             Application.OpenURL(url);
+        }
+
+        public void NaviSet()
+        {
+            googleMap.DestinationLat = placeDetailsResponse.result.geometry.location.lat;
+            googleMap.DestinationLon = placeDetailsResponse.result.geometry.location.lng;
         }
     }
 }

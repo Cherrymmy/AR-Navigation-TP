@@ -128,6 +128,18 @@ public class GoogleMap : MonoBehaviour, ISubject
     private float _dragInitGPSLat;
     private float _dragInitGPSLon;
 
+    public float DestinationLat
+    {
+        get => _destinationLat;
+        set => _destinationLat = value;
+    }
+
+    public float DestinationLon
+    {
+        get => _destinationLon;
+        set => _destinationLon = value;
+    }
+
     // Destination
     private float _destinationLat;
     private float _destinationLon;
