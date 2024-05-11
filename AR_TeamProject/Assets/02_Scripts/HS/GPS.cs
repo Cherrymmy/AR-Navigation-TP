@@ -6,7 +6,6 @@ using UnityEngine.UI;
 
 public class GPS : MonoBehaviour
 {
-
     //텍스트 ui변수
     public static GPS instance;
     //public Text latitude_text;
@@ -28,6 +27,7 @@ public class GPS : MonoBehaviour
         if (instance == null)
         {
             instance = this;
+            //DontDestroyOnLoad(this);
         }
     }
     void Start()

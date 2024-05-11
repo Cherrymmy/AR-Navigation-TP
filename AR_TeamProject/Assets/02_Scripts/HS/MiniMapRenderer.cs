@@ -32,6 +32,8 @@ public class MiniMapRenderer : MonoBehaviour, IDirectionMapObserver
         _gpsLon = gpslon;
         _destinationLat = deslat;
         _destinationLon = deslon;
+        Debug.Log("destination Lat " + _destinationLat + "destination Lon " + _destinationLon);
+        Debug.Log("gpsLat : " + _gpsLat + "gpsLon" + _gpsLon);
 
         StartCoroutine(GetDirectionsMap());
     }

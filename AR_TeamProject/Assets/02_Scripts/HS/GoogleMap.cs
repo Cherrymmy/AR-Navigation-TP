@@ -185,6 +185,11 @@ public class GoogleMap : MonoBehaviour, ISubject
         white
     }   
 
+    void Awake()
+    {
+        //DontDestroyOnLoad(this);
+    }
+
     private void Start()
     {
         GPSManager = GameObject.Find("GPSManager");

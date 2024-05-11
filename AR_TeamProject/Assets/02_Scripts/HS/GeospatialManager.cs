@@ -35,17 +35,17 @@ public class GeospatialManager : MonoBehaviour
 
     void Update()
     {
-        Debug.Log("begin update");
+        //Debug.Log("begin update");
         if(!Debug.isDebugBuild || earthManager == null)
         {
-            Debug.Log("!Debug.isDebugBuild || earthManager == null");
+            //Debug.Log("!Debug.isDebugBuild || earthManager == null");
             return;
         }
           
 
         if(ARSession.state != ARSessionState.SessionInitializing && ARSession.state != ARSessionState.SessionTracking)
         {
-            Debug.Log("ARSession.state != ARSessionState.SessionInitializing && ARSession.state != ARSessionState.SessionTracking");
+            //Debug.Log("ARSession.state != ARSessionState.SessionInitializing && ARSession.state != ARSessionState.SessionTracking");
             return;
         }
             
@@ -91,7 +91,7 @@ public class GeospatialManager : MonoBehaviour
                 $"OrientalYawAcc : {pose.OrientationYawAccuracy:F2}\n";
         }
 
-        Debug.Log("end update");
+        //Debug.Log("end update");
     }
     private void OnEnable()
     {
@@ -121,7 +121,7 @@ public class GeospatialManager : MonoBehaviour
 
         if(!Input.location.isEnabledByUser)
         {
-            Debug.Log("!Input.location.isEnabledByUser");
+            //Debug.Log("!Input.location.isEnabledByUser");
             waitingForLocationService = false;
             yield break;
         }
