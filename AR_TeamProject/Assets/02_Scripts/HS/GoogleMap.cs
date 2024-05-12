@@ -10,34 +10,30 @@ using UnityEngine.XR.ARFoundation;
 
 public class GoogleMap : MonoBehaviour, ISubject
 {
-    public string apiKey;       // 구글맵 api key
-    public float lat = 0.0f;    // 위도
-    public float lon = 0.0f;    // 경도
-
-    public enum resolution { low = 0, high = 2 }    // 해상도
-    public resolution MapResolution { get => _mapResolution; }
-    private resolution _mapResolution = resolution.low;
-
-    public enum type { roadmap, satellite, hybrid, terrain }    // 맵 타입
-    public type MapType { get => _maptype; }
-    private type _maptype = type.roadmap;
-
-    private string url = string.Empty;
-    private int _mapWidth = 640;
-    private int _mapHeight = 640;
-    //private bool mapIsLoading = false;
-    private Rect rect;
-    private string apiKeyLast;
-
     private float _latLast = -33.85660f;
     private float _lonLast = 151.21500f;
 
-    public int Zoom { get => _zoom; set => _zoom = value; }
+    public enum resolution { low = 0, high = 2 } // 해상도
+    public resolution MapResolution { get => _mapResolution; }
+    private resolution _mapResolution = resolution.low;
+    private resolution _mapResolutionLast = resolution.low;
+
+    public enum type { roadmap, satellite, hybrid, terrain } // 맵 타입
+    public type MapType { get => _maptype; }
+    private type _maptype = type.roadmap;
+    private type _mapTypeLast = type.roadmap;
+
+    public int Zoom 
+    { 
+        get => _zoom; 
+        set => _zoom = value; 
+    }
+
     private int _zoom = 14;
+
     public int ZoomLast { get => _zoomLast; }
     private int _zoomLast = 14;
-    private resolution _mapResolutionLast = resolution.low;
-    private type _mapTypeLast = type.roadmap;
+
     public bool UpdateMap
     {
         get => _updateMap;
@@ -49,22 +45,11 @@ public class GoogleMap : MonoBehaviour, ISubject
 
     // GPS
     private bool _isGPSWorked;
-    public float GpsLat
-    {
-        get => _gpsLat;
-    }
-
-    public float GpsLon
-    {
-        get => _gpsLon;
-    }
+    public float GpsLat { get => _gpsLat; }
+    public float GpsLon { get => _gpsLon; }
 
     private float _gpsLat;
     private float _gpsLon;
-
-    // marker GPS
-    private float _markerLat;
-    private float _markerLon;
 
     // Zoom & Dragging
     public bool IsGPSOn
@@ -121,8 +106,7 @@ public class GoogleMap : MonoBehaviour, ISubject
     private Image _marker;
     private Vector2 _markerInitPos;
 
-    // PolyLine
-    public string directionsApiKey; // Directions API용 API 키
+    // Drag
     public float DragInitGPSLat
     {
         get => _dragInitGPSLat;
@@ -138,6 +122,15 @@ public class GoogleMap : MonoBehaviour, ISubject
     private float _dragInitGPSLat;
     private float _dragInitGPSLon;
 
+    public bool IsDragZoomDisable
+    {
+        get => _isDragZoomDisable;
+        set => _isDragZoomDisable = value;
+    }
+
+    private bool _isDragZoomDisable;
+
+    // Destination
     public float DestinationLat
     {
         get => _destinationLat;
@@ -150,24 +143,13 @@ public class GoogleMap : MonoBehaviour, ISubject
         set => _destinationLon = value;
     }
 
-    // Destination
     private float _destinationLat;
     private float _destinationLon;
 
     // Canvas
-    public bool IsDragZoomDisable
-    {
-        get => _isDragZoomDisable;
-        set => _isDragZoomDisable = value;
-    }
-
-    private bool _isDragZoomDisable;
     private Canvas _staticMapCanvas;
-    private Canvas _detailMapCanvas;
-    private Canvas _naviMapCanvas;
-    private Canvas _miniMapCanvas;
 
-    // ObserverPattern
+    // Observer Pattern
     private List<IStaticMapObserver> _staticMapObserver = new List<IStaticMapObserver>();
     private List<IDirectionMapObserver> _directionMapObserver = new List<IDirectionMapObserver>();
 
@@ -193,24 +175,8 @@ public class GoogleMap : MonoBehaviour, ISubject
     private void Start()
     {
         GPSManager = GameObject.Find("GPSManager");
-        //_marker = GameObject.Find("Image - Marker").GetComponent<Image>();
-        //_markerInitPos = _marker.rectTransform.anchoredPosition;
-
         _staticMapCanvas = GameObject.Find("Canvas - StaticMap").GetComponent<Canvas>();
         _markerInitPos = _staticMapCanvas.GetComponentInChildren<StaticMapRenderer>().markerInitPosition;
-
-        _detailMapCanvas = GameObject.Find("Canvas - DetailMap").GetComponent<Canvas>();
-        _naviMapCanvas = GameObject.Find("Canvas - NaviMap").GetComponent<Canvas>();
-        _miniMapCanvas = GameObject.Find("Canvas - MiniMap").GetComponent<Canvas>();
-
-        _detailMapCanvas.enabled = false;
-        _naviMapCanvas.enabled = false;
-        _miniMapCanvas.enabled = false;
-
-        //StartCoroutine(GetGoogleMap());
-        //rect = gameObject.GetComponent<RawImage>().rectTransform.rect;
-        //_mapWidth = (int)Math.Round(rect.width);
-        //_mapHeight = (int)Math.Round(rect.height);
     }
 
     private void FixedUpdate()
@@ -222,8 +188,7 @@ public class GoogleMap : MonoBehaviour, ISubject
                 _gpsLat = GPSManager.GetComponent<GPS>().latitude;
                 _gpsLon = GPSManager.GetComponent<GPS>().longitude;
 
-                // gps가 초기화 되기 전에 막기 위한 변수
-                // gpsLat, gpsLon이 0, 0 이면 true를 반환
+                // gps가 초기화 되기 전에 막기 위한 변수 -> gpsLat, gpsLon이 0, 0 이면 true를 반환
                 _isGPSWorked = (Mathf.Approximately(_gpsLat, 0f) && Mathf.Approximately(_gpsLon, 0f));
             }
         }
@@ -231,169 +196,26 @@ public class GoogleMap : MonoBehaviour, ISubject
 
     private void Update()
     {
-        if (_updateMap && (apiKeyLast != apiKey || Mathf.Approximately(_latLast, /*lat*/_gpsLat) || Mathf.Approximately(_lonLast, /*lon*/_gpsLon) ||
-                        /*zoomLast != zoom ||*/ _mapResolutionLast != _mapResolution || _mapTypeLast != _maptype || !_isGPSWorked))
+        if (_updateMap && (Mathf.Approximately(_latLast, _gpsLat) || Mathf.Approximately(_lonLast, _gpsLon) ||
+                        _mapResolutionLast != _mapResolution || _mapTypeLast != _maptype || !_isGPSWorked))
         {
             // zoom in & out
             ZoomInAndOut();
 
             Draging();
-
-            //Debug.Log("Update map start");
-            //rect = gameObject.GetComponent<RawImage>().rectTransform.rect;
-            //_mapWidth = (int)Math.Round(rect.width);
-            //_mapHeight = (int)Math.Round(rect.height);
-
-            // 목적지가 설정되어 있지 않다면 static map 그리기
-            //if (Mathf.Approximately(_destinationLat, 0f) && Mathf.Approximately(_destinationLon, 0f))
-            //StartCoroutine(GetGoogleMap());
-            // 목적지가 설정되어 있다면 경로 그리기
-            //else
-            //StartCoroutine(GetDirections());
-            UpdateStaticMap();
-
-            // 목적지가 있을 때만 갱신해줌
+      
+            // 목적지가 있을 때만 필요한 데이터들을 갱신하라고 지시
             if(!(Mathf.Approximately(_destinationLat, 0f) && Mathf.Approximately(_destinationLon, 0f)))
             {
                 UpdateDirectionMap();
             }
 
+            UpdateStaticMap();
+
             _latLast = _gpsLat;
             _lonLast = _gpsLon;
             _zoomLast = _zoom;
             _updateMap = false;
-        }
-    }
-
-    private IEnumerator GetGoogleMap(string path = "")
-    {
-        url = "https://maps.googleapis.com/maps/api/staticmap?center=" + /*lat*/_gpsLat + "," + /*lon */_gpsLon +
-                                                                                "&zoom=" + _zoom +
-                                                                                "&size=" + _mapWidth +
-                                                                                "x" + _mapHeight +
-                                                                                "&scale=" + _mapResolution +
-                                                                                "&markers=" + "color:" + GoogleMapColor.purple + "|" + _markerLat + "," + _markerLon +
-                                                                                "&maptype=" + _maptype +
-                                                                                "&key=" + apiKey +
-                                                                                path; // 도보 + 대중교통 경로 추가
-        
-
-        //mapIsLoading = true;
-        UnityWebRequest www = UnityWebRequestTexture.GetTexture(url);
-        yield return www.SendWebRequest();
-
-        // 실패했을 경우
-        if (www.result != UnityWebRequest.Result.Success)
-        {
-            Debug.LogError("www error" + www.error);
-            Debug.LogError(url);
-        }
-        else
-        {
-            //mapIsLoading = false;
-            gameObject.GetComponent<RawImage>().texture = ((DownloadHandlerTexture)www.downloadHandler).texture;
-
-            apiKeyLast = apiKey;
-            //latLast = lat;
-            //lonLast = lon;
-            _latLast = _gpsLat;
-            _lonLast = _gpsLon;
-            _zoomLast = _zoom;
-            _mapResolutionLast = _mapResolution;
-            _mapTypeLast = _maptype;
-            _updateMap = true;
-        }
-
-        // 코루틴 종료
-        yield break;
-    }
-
-    private IEnumerator GetDirections()
-    {
-        string directionsUrl = string.Empty;
-
-        // 드래그를 시작하면 목적지가 검색된 시점의 gps를 기준으로 폴리라인을 그림
-        if (!_isGPSOn)
-        {
-            directionsUrl = "https://maps.googleapis.com/maps/api/directions/json?origin=" + _dragInitGPSLat + "," + _dragInitGPSLon +
-                                    "&destination=" + _destinationLat + "," + _destinationLon +
-                                    "&region=KR" +
-                                    "&mode=transit" +
-                                    "&key=" + directionsApiKey;
-        }
-        // 드래그를 하지 않는다면 gps 위치에 따라서 폴리라인을 그림 
-        else
-        {
-            directionsUrl = "https://maps.googleapis.com/maps/api/directions/json?origin=" + _gpsLat + "," + _gpsLon +
-                                    "&destination=" + _destinationLat + "," + _destinationLon +
-                                    "&region=KR" + 
-                                    "&mode=transit" +
-                                    "&key=" + directionsApiKey;
-        }
-
-        UnityWebRequest www = UnityWebRequest.Get(directionsUrl);
-        yield return www.SendWebRequest();
-
-        if (www.result != UnityWebRequest.Result.Success)
-        {
-            Debug.LogError("Directions API Error: " + www.error);
-        }
-        else
-        {
-            //Debug.Log(www.downloadHandler.text); // 확인용
-
-            JObject json = JObject.Parse(www.downloadHandler.text);
-            JArray routes = (JArray)json["routes"];
-
-
-            if (routes.Count > 0)
-            {
-                //string polyline = (string)routes[0]["overview_polyline"]["points"];
-
-                JArray legs = (JArray)routes[0]["legs"];
-                JArray steps = (JArray)legs[0]["steps"];
-
-                List<string> walkPolyline = new List<string>();
-                List<string> transitPolyline = new List<string>();
-
-                for (int i = 0; i < steps.Count; i++)
-                {
-                    string modes = (string)steps[i]["travel_mode"];
-                    if (modes.Equals("WALKING"))
-                    {
-                        walkPolyline.Add((string)steps[i]["polyline"]["points"]);
-                    }
-                    if (modes.Equals("TRANSIT"))
-                    {
-                        transitPolyline.Add((string)steps[i]["polyline"]["points"]);
-                    }
-                }
-
-                string[] walkPath = walkPolyline.ToArray();
-                string[] transitPath = transitPolyline.ToArray();
-
-                string walkPaths = string.Empty;
-                for (int i = 0; i < walkPath.Length; i++)
-                {
-                    walkPaths += "&path=color:0x8080807F|weight:5|enc:" + walkPath[i];
-                }
-
-                string transitPaths = string.Empty;
-                for (int i = 0; i < transitPath.Length; i++)
-                {
-                    transitPaths += "&path=color:0x0000ff80|weight:5|enc:" + transitPath[i];
-                }
-
-                string path = walkPaths + transitPaths;
-
-                //string path = "&path=enc:" + polyline;
-                yield return GetGoogleMap(path); // 경로가 포함된 지도 이미지를 가져오기 위해 수정된 GetGoogleMap 코루틴 호출
-            }
-            else
-            {
-                Debug.LogError("No routes found. Draw Static Map");
-                yield return GetGoogleMap();
-            }
         }
     }
 
@@ -424,6 +246,8 @@ public class GoogleMap : MonoBehaviour, ISubject
 
             int zoomScale = _zoom - _zoomLast;
 
+            // Drag Speed 보정
+            // 줌이 커지면 Drag Speed 값이 2배로 작아지고 줌이 작아지면 Drag Speed 값이 2배로 커짐
             _dragSpeed /= Mathf.Pow(2f, zoomScale);
 
             _prevTouch1Pos = curTouch1Pos;
@@ -461,7 +285,6 @@ public class GoogleMap : MonoBehaviour, ISubject
             {
                 Vector2 newpos = new Vector2(-horiziontalTouchDelta, 0);
                 _markerPos.x = newpos.x;
-                //_marker.rectTransform.anchoredPosition += newpos;
                 _gpsLon = _gpsLon + horiziontalTouchDelta * _dragSpeed;
                 _dragInitGPSLon = _gpsLon;
             }
@@ -471,15 +294,8 @@ public class GoogleMap : MonoBehaviour, ISubject
             {
                 Vector2 newpos = new Vector2(0, -verticalTouchDelta);
                 _markerPos.y = newpos.y;
-                //_marker.rectTransform.anchoredPosition += newpos;
                 _gpsLat = _gpsLat + verticalTouchDelta * _dragSpeed;
                 _dragInitGPSLat = _gpsLat;
-            }
-
-            DetailMapRenderer detailMapRenderer = _detailMapCanvas.transform.GetComponentInChildren<DetailMapRenderer>();
-            if (detailMapRenderer != null)
-            {
-                detailMapRenderer.IsDestinationSet = false;
             }
 
             _dragStartPos = curTouchPos;
@@ -489,106 +305,6 @@ public class GoogleMap : MonoBehaviour, ISubject
         {
             _isDraging = false;
         }
-    }
-
-    public void OnSetOnDestination()
-    {
-        // 목적지 야당역 설정
-        _destinationLat = 37.71275f;
-        _destinationLon = 126.7615f;
-
-        _dragInitGPSLat = _gpsLat;
-        _dragInitGPSLon = _gpsLon;
-
-        // 마커 위치를 목적지에 설정
-        //_markerLat = 37.71275f;
-        //_markerLon = 126.7615f;
-    }
-
-    public void OnSetOffDestination()
-    {
-        // 목적지 초기화
-        _destinationLat = 0f;
-        _destinationLon = 0f;
-
-        _dragInitGPSLat = 0f;
-        _dragInitGPSLon = 0f;
-    }
-
-    public void OnCloseButton()
-    {
-        //목적지 설정 및 캔버스 닫기(테스트 야당역)
-        _destinationLat = 37.7127491f;
-        _destinationLon = 126.7615354f;
-        //_gpsLat = 37.7127491f;
-        //_gpsLon = 126.7615354f;
-        //_isGPSOn = false;
-        
-        if(_staticMapCanvas != null)
-        {
-            _staticMapCanvas.enabled = false;
-        }
-        if(_detailMapCanvas != null)
-        {
-            _detailMapCanvas.enabled = true;
-        }
-
-        DetailMapRenderer detailMapRenderer = _detailMapCanvas.transform.GetComponentInChildren<DetailMapRenderer>();
-        if(detailMapRenderer != null)
-        {
-            Debug.Log("detailmap renderer destination set");
-            detailMapRenderer.IsDestinationSet = true;
-        }
-
-        // 목적지맵에서는 드래그, 줌인아웃 막기
-        _isDragZoomDisable = true;
-    }
-
-    public void OntestButton()
-    {
-        if (_staticMapCanvas != null)
-        {
-            _staticMapCanvas.enabled = true;
-        }
-        if (_detailMapCanvas != null)
-        {
-            _detailMapCanvas.enabled = false;
-        }
-
-        DetailMapRenderer detailMapRenderer = _detailMapCanvas.transform.GetComponentInChildren<DetailMapRenderer>();
-        if (detailMapRenderer != null)
-        {
-            detailMapRenderer.IsDestinationSet = false;
-        }
-
-        // 목적지맵 외 에서는 드래그, 줌인아웃 열기
-        _isDragZoomDisable = false;
-    }
-
-    public void OnDrawPathButton()
-    {
-        _detailMapCanvas.enabled = false;
-        _naviMapCanvas.enabled = true;
-
-        // 목적지맵 외 에서는 드래그, 줌인아웃 열기
-        _isDragZoomDisable = false;
-
-        // 경로 탐색 시작한 지점 초기화
-        NaviMapRenderer naviMapRenderer = _naviMapCanvas.GetComponentInChildren<NaviMapRenderer>();
-
-        if (naviMapRenderer != null)
-        {
-            naviMapRenderer.OriginLat = _gpsLat;
-            naviMapRenderer.OriginLon = _gpsLon;
-        }
-    }
-
-    public void OnShowMiniMapButton()
-    {
-        _naviMapCanvas.enabled = false;
-        _miniMapCanvas.enabled = true;
-
-        _isDragZoomDisable = true;
     }
 
     #region 옵저버패턴
