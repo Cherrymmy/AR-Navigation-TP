@@ -47,6 +47,7 @@ public class NaviMapView : IUimenu
         exitButton.onClick.AddListener(Close);
         // AR 씬 로드 하는거 여기에 
         ARChange.onClick.AddListener(Open);
+        ARChange.onClick.AddListener(OnDragDisableButton);
     }
 
     IEnumerator CameraAR()
@@ -59,8 +60,9 @@ public class NaviMapView : IUimenu
 
             if (!Permission.HasUserAuthorizedPermission(Permission.Camera))
             {
+                Permission.RequestUserPermission(Permission.Camera);
 #if UNITY_ANDROID
-                OpenAppSettings();
+                //OpenAppSettings();
 #endif
             }
         }
@@ -89,4 +91,13 @@ public class NaviMapView : IUimenu
     }
 #endif
 
+    private void OnDragDisableButton()
+    {
+        GoogleMap googleMap = GameObject.Find("GoogleMap").GetComponent<GoogleMap>();
+
+        if (googleMap != null)
+        {
+            googleMap.IsDragZoomDisable = true;
+        }
+    }
 }

@@ -128,7 +128,7 @@ namespace AR
         {
             googleMap.DestinationLat = placeDetailsResponse.result.geometry.location.lat;
             googleMap.DestinationLon = placeDetailsResponse.result.geometry.location.lng;
-            googleMap.IsDragZoomDisable = true;
+            //googleMap.IsDragZoomDisable = true;
         }
 
         public void OnDragAbleButton()

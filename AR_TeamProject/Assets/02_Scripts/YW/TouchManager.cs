@@ -41,43 +41,37 @@ public class TouchManager : MonoBehaviour
             Debug.LogError("AR 관련 컴포넌트를 찾을 수 없습니다.");
         }
 
+
         petButton.onClick.AddListener(PetManaging);
     }
 
     void Update()
     {
-        Vector2 screenCenter = new Vector2(Screen.width / 2, Screen.height / 2);
+        if (placeObjectInstance == null)
+            Petpet();
 
-        if (Input.touchCount > 0)
+        else
         {
-            Touch touch = Input.GetTouch(0);
-            if (touch.phase == TouchPhase.Began)
+            Vector2 screenCenter = new Vector2(Screen.width / 2, Screen.height / 2);
+
+            if (Input.touchCount > 0)
             {
-                List<ARRaycastHit> hits = new List<ARRaycastHit>();
-                if (raycastManager.Raycast(touch.position, hits, TrackableType.PlaneWithinPolygon))
+                Touch touch = Input.GetTouch(0);
+                if (touch.phase == TouchPhase.Began)
                 {
-                    Pose hitPose = hits[0].pose;
-                    if (placeObjectInstance == null)
-                    {
-                        placeObjectInstance = Instantiate(placeObjectPrefab, hitPose.position, Quaternion.identity);
-                        placeObjectInstance.AddComponent<BoxCollider>();
-                        placeObjectAnimator = placeObjectInstance.GetComponent<Animator>();
-                        SetupBalloonComponents();
-                        placeObjectInstance.SetActive(false);
-                    }
-                    else
+                    if (placeObjectInstance != null)
                     {
                         placeObjectAnimator.SetTrigger("jump");
                         ShowBalloon();
                     }
                 }
             }
-        }
 
-        if (placeObjectInstance != null && raycastManager.Raycast(screenCenter, raycastHits, TrackableType.PlaneWithinPolygon))
-        {
-            Pose hitPose = raycastHits[0].pose;
-            UpdateObjectPositionAndFollowUser(hitPose.position);
+            if (placeObjectInstance != null && raycastManager.Raycast(screenCenter, raycastHits, TrackableType.PlaneWithinPolygon))
+            {
+                Pose hitPose = raycastHits[0].pose;
+                UpdateObjectPositionAndFollowUser(hitPose.position);
+            }
         }
     }
 
@@ -86,6 +80,22 @@ public class TouchManager : MonoBehaviour
         // 껐다 켰다
         placeObjectInstance.SetActive(!petActive);
         petActive = !petActive;
+    }
+
+    void Petpet()
+    {
+        Vector2 screenCenter = new Vector2(Screen.width / 2, Screen.height / 2);
+
+        List<ARRaycastHit> hits = new List<ARRaycastHit>();
+        if (raycastManager.Raycast(screenCenter, hits, TrackableType.PlaneWithinPolygon))
+        {
+            Pose hitPose = hits[0].pose;
+            placeObjectInstance = Instantiate(placeObjectPrefab, hitPose.position, Quaternion.identity);
+            placeObjectInstance.AddComponent<BoxCollider>();
+            placeObjectAnimator = placeObjectInstance.GetComponent<Animator>();
+            SetupBalloonComponents();
+            placeObjectInstance.SetActive(false);
+        }
     }
 
     /// <summary>

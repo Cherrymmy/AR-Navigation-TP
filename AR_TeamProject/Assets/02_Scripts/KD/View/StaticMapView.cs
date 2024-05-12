@@ -12,7 +12,7 @@ public class StaticMapView : IUimenu
 
     void Start()
     {
-        joinButton.onClick.AddListener(Open);
+        joinButton.onClick.AddListener(delegate { Open(); OnDragDisableButton(); });
     }
 
     public override void Close()
@@ -29,5 +29,15 @@ public class StaticMapView : IUimenu
     {
         UIManager.Instance.Switch(CurrentMenu, TargetMenuType);
         UIManager.Instance.LoadingSet = false;
+    }
+
+    private void OnDragDisableButton()
+    {
+        GoogleMap googleMap = GameObject.Find("GoogleMap").GetComponent<GoogleMap>();
+
+        if (googleMap != null)
+        {
+            googleMap.IsDragZoomDisable = true;
+        }
     }
 }
