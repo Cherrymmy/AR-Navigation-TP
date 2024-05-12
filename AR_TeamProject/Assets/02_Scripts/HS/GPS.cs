@@ -27,7 +27,7 @@ public class GPS : MonoBehaviour
         if (instance == null)
         {
             instance = this;
-            //DontDestroyOnLoad(this);
+            DontDestroyOnLoad(this.gameObject);
         }
     }
     void Start()
@@ -42,6 +42,7 @@ public class GPS : MonoBehaviour
         if (!Permission.HasUserAuthorizedPermission(Permission.FineLocation))
         {
             Permission.RequestUserPermission(Permission.FineLocation);
+            yield return null;
 
             if (!Permission.HasUserAuthorizedPermission(Permission.FineLocation))
             {

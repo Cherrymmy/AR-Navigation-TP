@@ -187,7 +187,7 @@ public class GoogleMap : MonoBehaviour, ISubject
 
     void Awake()
     {
-        //DontDestroyOnLoad(this);
+        DontDestroyOnLoad(this.gameObject);
     }
 
     private void Start()
