@@ -41,7 +41,7 @@ public class DetailMapRenderer : MonoBehaviour, IDirectionMapObserver
 
     private void OnDisable()
     {
-        _mapData.ResisterDirectionMapObserver(this);
+        _mapData.RemoveDirectionMapObserver(this);
     }
 
     void Start()

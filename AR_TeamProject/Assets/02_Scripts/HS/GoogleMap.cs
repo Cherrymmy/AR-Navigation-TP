@@ -342,6 +342,7 @@ public class GoogleMap : MonoBehaviour, ISubject
 
     public void NotifyDirectionMapObservers()
     {
+        //Debug.Log("_directionMapObserver " + _directionMapObserver.Count);
         foreach(IDirectionMapObserver observer in _directionMapObserver)
         {
             observer.UpdateData(_gpsLat, _gpsLon, _destinationLat, _destinationLon, _dragInitGPSLat, _dragInitGPSLon, _zoom, _markerPos);
