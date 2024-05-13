@@ -7,14 +7,15 @@ using UnityEngine;
 
 public class DestinationNotify : MonoBehaviour
 {
+    // data manager, 위치정보를 가지고 있는 싱글톤
     public DataManager dataManager;
+    // 도착 팝업 이미지, 인스펙터창에서 넣어줘도 되고 그냥 find 해도 됨 맘에드는 이미지로 연결
     public GameObject arrival_popup;
     public bool isFirst = false;
 
-    // 도착지 위도 경도를 저장할 리스트
-    //private List<double> lats = new List<double>();
-    //private List<double> longs = new List<double>();
+    // 도착지 위도
     private float lats;
+    // 도착지 경도
     private float lons;
 
     private void Start()
@@ -29,20 +30,26 @@ public class DestinationNotify : MonoBehaviour
 
     void Update()
     {       
+        // GPS 연결되어있을 때 
         if (Input.location.status == LocationServiceStatus.Running)
         {
+            // 도착지 위도, 경도가 정해져있을 때 (0일 때는 포함 x)
             if (lats != 0 && lons != 0)
-            { 
+            {
+                //현재 내 위치 위도, 경도 업데이트문에서 받아오기
                 double myLat = Input.location.lastData.latitude;
                 double myLong = Input.location.lastData.longitude;
 
+                // 도착까지 남은 거리 계산
                 double remainDistance = distance(myLat, myLong, lats, lons);
 
-                if (remainDistance <= 5f) // 7m
+                if (remainDistance <= 15f) // 20m 반경 이내에 도착지가 있다면 
                 {
                     if (!isFirst)
                     {
+                        // 도착을 표시할 불값
                         isFirst = true;
+                        // 팝업 표시
                         arrival_popup.SetActive(true);
                     }
                 }
@@ -50,15 +57,18 @@ public class DestinationNotify : MonoBehaviour
         }
     }
 
-    // 사용자가 새로운 도착지를 입력할 때 호출되는 메서드
+    // 도착지 위도, 경도 입력 메서드
     public void AddDestination()
     {
+        // 도착지 위도 경도 받아와서 넣어주기
         lats = dataManager.detailResponse.result.geometry.location.lat;
         lons = dataManager.detailResponse.result.geometry.location.lng;
-        Debug.Log("끝 :" + lats + ","+ lons);
+
+        //lats = 37.71432696f;
+        //lons = 126.74255351f;
     }
 
-    // 지표면 거리 계산 공식(하버사인 공식)
+    // 지표면 거리 계산 공식(하버사인 공식) 남은 거리 계산 공식.
     private double distance(double lat1, double lon1, double lat2, double lon2)
     {
         double theta = lon1 - lon2;

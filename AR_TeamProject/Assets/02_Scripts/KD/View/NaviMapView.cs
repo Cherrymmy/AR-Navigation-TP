@@ -28,7 +28,7 @@ public class NaviMapView : IUimenu
         if (!Permission.HasUserAuthorizedPermission(Permission.Camera))
             StartCoroutine(CameraAR());
         else
-            SceneManager.LoadScene(2);
+            SceneManager.LoadSceneAsync(2);
     }
 
     public override void TargetSwitch()
