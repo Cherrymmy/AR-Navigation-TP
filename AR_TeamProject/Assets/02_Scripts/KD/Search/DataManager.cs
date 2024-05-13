@@ -88,7 +88,7 @@ namespace AR
             public int height;
             public string photo_reference;
             public int width;
-            public string[] htmlAttributions; // 이 필드가 누락된 것 같습니다. 'html_attributions' 정보를 저장할 필드
+            public string[] htmlAttributions;
         }
 
         [System.Serializable]
@@ -107,7 +107,8 @@ namespace AR
         #endregion
 
         public PlacesDatas jsonDatas { get; private set; }
-        public PlacesResponse PlacesData { get; set; } 
+        public PlacesResponse PlacesData { get; set; }
+        public PlaceDetailsResponse detailResponse { get; set; }
 
         public static DataManager Instance { get; private set; }
 
