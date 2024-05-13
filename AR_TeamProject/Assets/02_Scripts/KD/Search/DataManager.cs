@@ -130,6 +130,7 @@ namespace AR
         private void Start()
         {
             LoadPlacesDatas();
+            DontDestroyOnLoad(gameObject);
         }
 
         /// <summary>

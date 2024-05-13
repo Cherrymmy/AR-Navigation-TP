@@ -49,6 +49,7 @@ namespace AR
             _placesModel = FindAnyObjectByType<PlacesModel>();
             _placeSearchView = FindAnyObjectByType<PlaceSearchView>();
             InitializePool();
+            DontDestroyOnLoad(gameObject);
         }
 
         /// <summary>
