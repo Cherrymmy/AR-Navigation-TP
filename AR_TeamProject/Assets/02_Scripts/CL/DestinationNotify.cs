@@ -12,8 +12,10 @@ public class DestinationNotify : MonoBehaviour
     public bool isFirst = false;
 
     // 도착지 위도 경도를 저장할 리스트
-    private List<double> lats = new List<double>();
-    private List<double> longs = new List<double>();
+    //private List<double> lats = new List<double>();
+    //private List<double> longs = new List<double>();
+    private float lats;
+    private float lons;
 
     private void Start()
     {
@@ -26,20 +28,23 @@ public class DestinationNotify : MonoBehaviour
     }
 
     void Update()
-    {
+    {       
         if (Input.location.status == LocationServiceStatus.Running)
         {
-            double myLat = Input.location.lastData.latitude;
-            double myLong = Input.location.lastData.longitude;
+            if (lats != 0 && lons != 0)
+            { 
+                double myLat = Input.location.lastData.latitude;
+                double myLong = Input.location.lastData.longitude;
 
-            double remainDistance = distance(myLat, myLong, lats.Count > 0 ? lats[0] : 0, longs.Count > 0 ? longs[0] : 0);
+                double remainDistance = distance(myLat, myLong, lats, lons);
 
-            if (remainDistance <= 100f) // 7m
-            {
-                if (!isFirst)
+                if (remainDistance <= 5f) // 7m
                 {
-                    isFirst = true;
-                    arrival_popup.SetActive(true);
+                    if (!isFirst)
+                    {
+                        isFirst = true;
+                        arrival_popup.SetActive(true);
+                    }
                 }
             }
         }
@@ -48,18 +53,9 @@ public class DestinationNotify : MonoBehaviour
     // 사용자가 새로운 도착지를 입력할 때 호출되는 메서드
     public void AddDestination()
     {
-        float lat = dataManager.detailResponse.result.geometry.location.lat;
-        float lon = dataManager.detailResponse.result.geometry.location.lng;
-
-        if (lat != 0 && lon != 0)
-        {
-            // 리스트의 맨 앞에 새로운 값 삽입
-            lats.Insert(0, lat);
-            Debug.Log($"lat" + lat);
-            // 리스트의 맨 앞에 새로운 값 삽입
-            longs.Insert(0, lon);
-            Debug.Log($"lon" + lon);
-        }
+        lats = dataManager.detailResponse.result.geometry.location.lat;
+        lons = dataManager.detailResponse.result.geometry.location.lng;
+        Debug.Log("끝 :" + lats + ","+ lons);
     }
 
     // 지표면 거리 계산 공식(하버사인 공식)

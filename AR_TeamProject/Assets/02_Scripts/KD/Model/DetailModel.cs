@@ -15,8 +15,8 @@ namespace AR
 
         string apiKey = "AIzaSyCsyqqXiR26jn_xlk5UTmDdKdKqLoHyw1U";
         string fields = "name,photos,geometry,vicinity,editorial_summary,reviews,user_ratings_total,type,formatted_phone_number,rating";
-        public PlaceDetailsResponse placeDetailsResponse { get; set; }
-
+        public PlaceDetailsResponse placeDetailsResponse { get => Instance.detailResponse; set => Instance.detailResponse = value; }
+         
         public UnityEvent OnDetailSearchComplete;
         public Texture2D texture;
 
