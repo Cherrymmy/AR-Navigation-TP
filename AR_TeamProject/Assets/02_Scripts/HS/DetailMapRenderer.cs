@@ -41,7 +41,7 @@ public class DetailMapRenderer : MonoBehaviour, IDirectionMapObserver
 
     private void OnDisable()
     {
-        _mapData.RemoveDirectionMapObserver(this);
+        //_mapData.RemoveDirectionMapObserver(this);
     }
 
     void Start()
@@ -50,6 +50,7 @@ public class DetailMapRenderer : MonoBehaviour, IDirectionMapObserver
         _mapWidth = (int)Math.Round(_rect.width);
         _mapHeight = (int)Math.Round(_rect.height);
 
+        this.gameObject.GetComponent<DetailMapRenderer>().enabled = false;
         StartCoroutine(GetGoogleStaticMap());
     }
 

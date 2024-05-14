@@ -46,7 +46,7 @@ public class MiniMapRenderer : MonoBehaviour, IDirectionMapObserver
 
     private void OnDisable()
     {
-        _mapData.RemoveDirectionMapObserver(this);
+        //_mapData.RemoveDirectionMapObserver(this);
     }
 
     void Start()
@@ -54,6 +54,8 @@ public class MiniMapRenderer : MonoBehaviour, IDirectionMapObserver
         _rect = GetComponent<RawImage>().rectTransform.rect;
         _mapWidth = (int)Math.Round(_rect.width);
         _mapHeight = (int)Math.Round(_rect.height);
+
+        this.gameObject.GetComponent<MiniMapRenderer>().enabled = false;
 
         StartCoroutine(GetGoogleStaticMap());
     }

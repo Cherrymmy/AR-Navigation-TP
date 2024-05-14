@@ -126,8 +126,15 @@ namespace AR
 
         private void NaviSet()
         {
+            DetailMapRenderer detailRenderer = GameObject.Find("RawImage - DetailMap").GetComponent<DetailMapRenderer>();
+            if(detailRenderer != null)
+            {
+                detailRenderer.enabled = true;
+            }
+
             googleMap.DestinationLat = placeDetailsResponse.result.geometry.location.lat;
             googleMap.DestinationLon = placeDetailsResponse.result.geometry.location.lng;
+
             //googleMap.IsDragZoomDisable = true;
         }
 

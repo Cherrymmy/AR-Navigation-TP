@@ -61,7 +61,7 @@ public class StaticMapRenderer : MonoBehaviour, IStaticMapObserver
 
     private void OnDisable()
     {
-        _mapData.RemoveStaticMapObserver(this);
+        //_mapData.RemoveStaticMapObserver(this);
     }
 
     // Start is called before the first frame update

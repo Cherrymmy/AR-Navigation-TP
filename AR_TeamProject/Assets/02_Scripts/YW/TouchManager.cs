@@ -27,9 +27,9 @@ public class TouchManager : MonoBehaviour
     {
         "안녕하세요!",
         "저를 따라오세요!",
-        "잘 오고있나요?",
-        "거의 다 왔어요!!",
-        "도착!"
+        "제 춤 어떤가요?",
+        "저는 Pet이에요!"
+        
     };
 
     void Start()

@@ -51,7 +51,7 @@ namespace AR
         {
             TargetSwitch();
             UIManager.Instance.LoadingSet = false;
-
+            OnDisableButton();
 
         }
 
@@ -88,6 +88,23 @@ namespace AR
         {
             _destinationNotify.AddDestination();
             
+        }
+
+        private void OnDisableButton()
+        {
+            NaviMapRenderer naviMapRenderer = GameObject.Find("RawImage - NaviMap").GetComponent<NaviMapRenderer>();
+
+            if (naviMapRenderer != null)
+            {
+                naviMapRenderer.enabled = true;
+            }
+
+            DetailMapRenderer detailMapRenderer = GameObject.Find("RawImage - DetailMap").GetComponent<DetailMapRenderer>();
+
+            if(detailMapRenderer != null)
+            {
+                detailMapRenderer.enabled = false;
+            }
         }
     }
 

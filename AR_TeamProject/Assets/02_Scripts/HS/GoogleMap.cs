@@ -352,9 +352,11 @@ public class GoogleMap : MonoBehaviour, ISubject
     public void RemoveStaticMapObserver(IStaticMapObserver observer)
     {
         _staticMapObserver.Remove(observer);
-    }
+        //_directionMapObserver
 
-    public void RemoveDirectionMapObserver(IDirectionMapObserver observer)
+}
+
+public void RemoveDirectionMapObserver(IDirectionMapObserver observer)
     {
         _directionMapObserver.Remove(observer);
     }
