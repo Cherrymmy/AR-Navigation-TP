@@ -34,9 +34,7 @@ public class DetailMapRenderer : MonoBehaviour, IDirectionMapObserver
 
     private void OnEnable()
     {
-        _mapData = GameObject.Find("GoogleMap").GetComponent<GoogleMap>();
 
-        _mapData.ResisterDirectionMapObserver(this);
     }
 
     private void OnDisable()
@@ -49,7 +47,9 @@ public class DetailMapRenderer : MonoBehaviour, IDirectionMapObserver
         _rect = GetComponent<RawImage>().rectTransform.rect;
         _mapWidth = (int)Math.Round(_rect.width);
         _mapHeight = (int)Math.Round(_rect.height);
+        _mapData = GameObject.Find("GoogleMap").GetComponent<GoogleMap>();
 
+        _mapData.ResisterDirectionMapObserver(this);
         this.gameObject.GetComponent<DetailMapRenderer>().enabled = false;
         StartCoroutine(GetGoogleStaticMap());
     }

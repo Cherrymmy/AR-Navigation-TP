@@ -54,9 +54,9 @@ public class StaticMapRenderer : MonoBehaviour, IStaticMapObserver
 
     private void OnEnable() 
     {
-        _mapData = GameObject.Find("GoogleMap").GetComponent<GoogleMap>();
+        //_mapData = GameObject.Find("GoogleMap").GetComponent<GoogleMap>();
 
-        _mapData.ResisterStaticMapObserver(this);
+        //_mapData.ResisterStaticMapObserver(this);
     }
 
     private void OnDisable()
@@ -73,6 +73,10 @@ public class StaticMapRenderer : MonoBehaviour, IStaticMapObserver
         _rect = GetComponent<RawImage>().rectTransform.rect;
         _mapWidth = (int)Math.Round(_rect.width);
         _mapHeight = (int)Math.Round(_rect.height);
+
+        _mapData = GameObject.Find("GoogleMap").GetComponent<GoogleMap>();
+
+        _mapData.ResisterStaticMapObserver(this);
 
         StartCoroutine(GetGoogleStaticMap());
     }

@@ -2,6 +2,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Rendering;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Networking;
@@ -177,6 +178,7 @@ public class GoogleMap : MonoBehaviour, ISubject
         GPSManager = GameObject.Find("GPSManager");
         _staticMapCanvas = GameObject.Find("Canvas - StaticMap").GetComponent<Canvas>();
         _markerInitPos = _staticMapCanvas.GetComponentInChildren<StaticMapRenderer>().markerInitPosition;
+        StartCoroutine(C_UpdateData());
     }
 
     private void FixedUpdate()
@@ -203,19 +205,6 @@ public class GoogleMap : MonoBehaviour, ISubject
             ZoomInAndOut();
 
             Draging();
-      
-            // 목적지가 있을 때만 필요한 데이터들을 갱신하라고 지시
-            if(!(Mathf.Approximately(_destinationLat, 0f) && Mathf.Approximately(_destinationLon, 0f)))
-            {
-                UpdateDirectionMap();
-            }
-
-            UpdateStaticMap();
-
-            _latLast = _gpsLat;
-            _lonLast = _gpsLon;
-            _zoomLast = _zoom;
-            _updateMap = false;
         }
     }
 
@@ -332,6 +321,29 @@ public class GoogleMap : MonoBehaviour, ISubject
         {
             _isDraging = false;
         }
+    }
+
+    IEnumerator C_UpdateData()
+    {
+        while(true)
+        {
+            // 목적지가 있을 때만 필요한 데이터들을 갱신하라고 지시
+            if (!(Mathf.Approximately(_destinationLat, 0f) && Mathf.Approximately(_destinationLon, 0f)))
+            {
+                UpdateDirectionMap();
+            }
+
+            UpdateStaticMap();
+
+            _latLast = _gpsLat;
+            _lonLast = _gpsLon;
+            _zoomLast = _zoom;
+            _updateMap = false;
+
+            yield return new WaitForSeconds(5f);
+            //yield return new WaitForSeconds(0.016f);
+        }
+
     }
 
     #region 옵저버패턴
