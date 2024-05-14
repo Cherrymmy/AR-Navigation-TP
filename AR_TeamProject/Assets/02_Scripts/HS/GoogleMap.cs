@@ -248,7 +248,7 @@ public class GoogleMap : MonoBehaviour, ISubject
 
             // Drag Speed 보정
             // 줌이 커지면 Drag Speed 값이 2배로 작아지고 줌이 작아지면 Drag Speed 값이 2배로 커짐
-            _dragSpeed /= Mathf.Pow(2f, zoomScale);
+            //_dragSpeed /= Mathf.Pow(2f, zoomScale);
 
             _prevTouch1Pos = curTouch1Pos;
             _prevTouch2Pos = curTouch2Pos;
@@ -279,6 +279,33 @@ public class GoogleMap : MonoBehaviour, ISubject
 
             float horiziontalTouchDelta = (_dragStartPos.x - curTouchPos.x);
             float verticalTouchDelta = (_dragStartPos.y - curTouchPos.y);
+
+            switch (_zoom)
+            {
+                case 14:
+                    _dragSpeed = 0.000085f;
+                    break;
+                case 15:
+                    _dragSpeed = 0.000085f / 2f;
+                    break;
+                case 16:
+                    _dragSpeed = 0.000085f / 4f;
+                    break;
+                case 17:
+                    _dragSpeed = 0.000085f / 8f;
+                    break;
+                case 18:
+                    _dragSpeed = 0.000085f / 16f;
+                    break;
+                case 19:
+                    _dragSpeed = 0.000085f / 32f;
+                    break;
+                case 20:
+                    _dragSpeed = 0.000085f / 64f;
+                    break;
+                default:
+                    break;
+            }
 
             // 좌우로 swipe 했다면
             if (Mathf.Abs(horiziontalTouchDelta * _dragSpeed) > 0f)

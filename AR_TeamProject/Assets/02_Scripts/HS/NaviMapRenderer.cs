@@ -31,7 +31,7 @@ public class NaviMapRenderer : MonoBehaviour, IDirectionMapObserver
 
     private float _originLat;
     private float _originLon;
-    private int _zoom = 12;
+    private int _zoom = 15;
     private int _mapWidth;
     private int _mapHeight;
 
@@ -79,7 +79,7 @@ public class NaviMapRenderer : MonoBehaviour, IDirectionMapObserver
         _destinationLat = deslat;
         _destinationLon = deslon;
 
-        _zoom = zoom;
+        //_zoom = zoom;
 
         StartCoroutine(GetDirectionsMap());
     }
@@ -120,8 +120,8 @@ public class NaviMapRenderer : MonoBehaviour, IDirectionMapObserver
                                                                                "&scale=" + _mapData.MapResolution +
                                                                                "&maptype=" + _mapData.MapType +
                                                                                "&key=" + _apiKey +
-                                                                               "&markers=" + "color:" + GoogleMap.GoogleMapColor.green + "|" + _destinationLat + "," + _destinationLon +
-                                                                               "&markers=" + "color:" + GoogleMap.GoogleMapColor.red + "|" + _originLat + "," + _originLon +
+                                                                               "&markers=" + "color:" + GoogleMap.GoogleMapColor.green + "|" + "label:D|" + _destinationLat + "," + _destinationLon +
+                                                                               "&markers=" + "color:" + GoogleMap.GoogleMapColor.red + "|" + "label:S|" + _originLat + "," + _originLon +
                                                                                path;
 
 
