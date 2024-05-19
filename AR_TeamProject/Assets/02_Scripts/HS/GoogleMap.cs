@@ -2,6 +2,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Rendering;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Networking;
@@ -177,6 +178,7 @@ public class GoogleMap : MonoBehaviour, ISubject
         GPSManager = GameObject.Find("GPSManager");
         _staticMapCanvas = GameObject.Find("Canvas - StaticMap").GetComponent<Canvas>();
         _markerInitPos = _staticMapCanvas.GetComponentInChildren<StaticMapRenderer>().markerInitPosition;
+        StartCoroutine(C_UpdateData());
     }
 
     private void FixedUpdate()
@@ -203,19 +205,6 @@ public class GoogleMap : MonoBehaviour, ISubject
             ZoomInAndOut();
 
             Draging();
-      
-            // 목적지가 있을 때만 필요한 데이터들을 갱신하라고 지시
-            if(!(Mathf.Approximately(_destinationLat, 0f) && Mathf.Approximately(_destinationLon, 0f)))
-            {
-                UpdateDirectionMap();
-            }
-
-            UpdateStaticMap();
-
-            _latLast = _gpsLat;
-            _lonLast = _gpsLon;
-            _zoomLast = _zoom;
-            _updateMap = false;
         }
     }
 
@@ -248,7 +237,7 @@ public class GoogleMap : MonoBehaviour, ISubject
 
             // Drag Speed 보정
             // 줌이 커지면 Drag Speed 값이 2배로 작아지고 줌이 작아지면 Drag Speed 값이 2배로 커짐
-            _dragSpeed /= Mathf.Pow(2f, zoomScale);
+            //_dragSpeed /= Mathf.Pow(2f, zoomScale);
 
             _prevTouch1Pos = curTouch1Pos;
             _prevTouch2Pos = curTouch2Pos;
@@ -280,6 +269,33 @@ public class GoogleMap : MonoBehaviour, ISubject
             float horiziontalTouchDelta = (_dragStartPos.x - curTouchPos.x);
             float verticalTouchDelta = (_dragStartPos.y - curTouchPos.y);
 
+            switch (_zoom)
+            {
+                case 14:
+                    _dragSpeed = 0.000085f;
+                    break;
+                case 15:
+                    _dragSpeed = 0.000085f / 2f;
+                    break;
+                case 16:
+                    _dragSpeed = 0.000085f / 4f;
+                    break;
+                case 17:
+                    _dragSpeed = 0.000085f / 8f;
+                    break;
+                case 18:
+                    _dragSpeed = 0.000085f / 16f;
+                    break;
+                case 19:
+                    _dragSpeed = 0.000085f / 32f;
+                    break;
+                case 20:
+                    _dragSpeed = 0.000085f / 64f;
+                    break;
+                default:
+                    break;
+            }
+
             // 좌우로 swipe 했다면
             if (Mathf.Abs(horiziontalTouchDelta * _dragSpeed) > 0f)
             {
@@ -307,6 +323,29 @@ public class GoogleMap : MonoBehaviour, ISubject
         }
     }
 
+    IEnumerator C_UpdateData()
+    {
+        while(true)
+        {
+            // 목적지가 있을 때만 필요한 데이터들을 갱신하라고 지시
+            if (!(Mathf.Approximately(_destinationLat, 0f) && Mathf.Approximately(_destinationLon, 0f)))
+            {
+                UpdateDirectionMap();
+            }
+
+            UpdateStaticMap();
+
+            _latLast = _gpsLat;
+            _lonLast = _gpsLon;
+            _zoomLast = _zoom;
+            _updateMap = false;
+
+            yield return new WaitForSeconds(5f);
+            //yield return new WaitForSeconds(0.016f);
+        }
+
+    }
+
     #region 옵저버패턴
     /// <summary>
     /// staticMap/DirectionMap Resister
@@ -325,9 +364,11 @@ public class GoogleMap : MonoBehaviour, ISubject
     public void RemoveStaticMapObserver(IStaticMapObserver observer)
     {
         _staticMapObserver.Remove(observer);
-    }
+        //_directionMapObserver
 
-    public void RemoveDirectionMapObserver(IDirectionMapObserver observer)
+}
+
+public void RemoveDirectionMapObserver(IDirectionMapObserver observer)
     {
         _directionMapObserver.Remove(observer);
     }
@@ -342,6 +383,7 @@ public class GoogleMap : MonoBehaviour, ISubject
 
     public void NotifyDirectionMapObservers()
     {
+        //Debug.Log("_directionMapObserver " + _directionMapObserver.Count);
         foreach(IDirectionMapObserver observer in _directionMapObserver)
         {
             observer.UpdateData(_gpsLat, _gpsLon, _destinationLat, _destinationLon, _dragInitGPSLat, _dragInitGPSLon, _zoom, _markerPos);

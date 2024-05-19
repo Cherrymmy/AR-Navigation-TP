@@ -40,6 +40,7 @@ namespace AR
         public override void Close()
         {
             TargetSwitch2Meun();
+            OnEnableStatic();
             UIManager.Instance.LoadingSet = false;
         }
 
@@ -67,6 +68,16 @@ namespace AR
         {
             
             OnInputFieldChange.Invoke();
+        }
+
+        private void OnEnableStatic()
+        {
+            StaticMapRenderer staticMapRenderer = GameObject.Find("RawImage - StaticMap").GetComponent<StaticMapRenderer>();
+
+            if(staticMapRenderer != null )
+            {
+                staticMapRenderer.enabled = true;
+            }
         }
     }
 }

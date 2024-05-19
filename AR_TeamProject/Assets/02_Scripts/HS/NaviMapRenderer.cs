@@ -31,7 +31,7 @@ public class NaviMapRenderer : MonoBehaviour, IDirectionMapObserver
 
     private float _originLat;
     private float _originLon;
-    private int _zoom = 12;
+    private int _zoom = 15;
     private int _mapWidth;
     private int _mapHeight;
 
@@ -79,21 +79,19 @@ public class NaviMapRenderer : MonoBehaviour, IDirectionMapObserver
         _destinationLat = deslat;
         _destinationLon = deslon;
 
-        _zoom = zoom;
+        //_zoom = zoom;
 
         StartCoroutine(GetDirectionsMap());
     }
 
     private void OnEnable() 
     {
-        _mapData = GameObject.Find("GoogleMap").GetComponent<GoogleMap>();
 
-        _mapData.ResisterDirectionMapObserver(this);
     }
 
     private void OnDisable()
     {
-        _mapData.ResisterDirectionMapObserver(this);
+        //_mapData.RemoveDirectionMapObserver(this);
     }
 
     void Start()
@@ -104,6 +102,14 @@ public class NaviMapRenderer : MonoBehaviour, IDirectionMapObserver
         _rect = GetComponent<RawImage>().rectTransform.rect;
         _mapWidth = (int)Math.Round(_rect.width);
         _mapHeight = (int)Math.Round(_rect.height);
+
+        _mapData = GameObject.Find("GoogleMap").GetComponent<GoogleMap>();
+
+        _mapData.ResisterDirectionMapObserver(this);
+
+        this.gameObject.GetComponent<NaviMapRenderer>().enabled = false;
+
+
 
         StartCoroutine(GetGoogleStaticMap());
     }
@@ -120,8 +126,8 @@ public class NaviMapRenderer : MonoBehaviour, IDirectionMapObserver
                                                                                "&scale=" + _mapData.MapResolution +
                                                                                "&maptype=" + _mapData.MapType +
                                                                                "&key=" + _apiKey +
-                                                                               "&markers=" + "color:" + GoogleMap.GoogleMapColor.green + "|" + _destinationLat + "," + _destinationLon +
-                                                                               "&markers=" + "color:" + GoogleMap.GoogleMapColor.red + "|" + _originLat + "," + _originLon +
+                                                                               "&markers=" + "color:" + GoogleMap.GoogleMapColor.green + "|" + "label:D|" + _destinationLat + "," + _destinationLon +
+                                                                               "&markers=" + "color:" + GoogleMap.GoogleMapColor.red + "|" + "label:S|" + _originLat + "," + _originLon +
                                                                                path;
 
 

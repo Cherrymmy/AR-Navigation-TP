@@ -32,7 +32,7 @@ namespace AR
             _placesModel.OnDataParsed.AddListener(SearchCreate);                                                         // 서치 완료 이벤트
             _placesModel.OnDataUpdated.AddListener(ReSearchCreate);                                                      // 이전 기록 저장시
 
-
+            DontDestroyOnLoad(gameObject);
 
         }
         #region 요청 및 UI 생성

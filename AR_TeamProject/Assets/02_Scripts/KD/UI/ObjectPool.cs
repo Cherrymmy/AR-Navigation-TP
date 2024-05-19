@@ -32,6 +32,8 @@ namespace AR
         // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 
+
+
         private void Awake()
         {
             if (_instance == null)
@@ -49,6 +51,7 @@ namespace AR
             _placesModel = FindAnyObjectByType<PlacesModel>();
             _placeSearchView = FindAnyObjectByType<PlaceSearchView>();
             InitializePool();
+            DontDestroyOnLoad(gameObject);
         }
 
         /// <summary>

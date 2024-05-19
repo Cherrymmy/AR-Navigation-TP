@@ -9,7 +9,7 @@ EditorBuildSettings:
     path: Assets/01_Scenes/CL/LoadingScene.unity
     guid: 6e50fa4139c16d14a92e340e587a8084
   - enabled: 1
-    path: Assets/01_Scenes/HS/UIScenes - HS.unity
+    path: Assets/01_Scenes/HS/UIScenes - Final.unity
     guid: 2a6e42e553151e948a87450ff3f1d5ed
   - enabled: 0
     path: Assets/01_Scenes/KD/UIScenes.unity
@@ -18,7 +18,7 @@ EditorBuildSettings:
     path: Assets/01_Scenes/GC/AR.unity
     guid: 26bfeb41b034a504288322979ac76d2a
   - enabled: 1
-    path: Assets/01_Scenes/HS/AR - HS.unity
+    path: Assets/01_Scenes/HS/AR - Final.unity
     guid: f2a887bfb05409243941e2dd6ab1c514
   m_configObjects:
     UnityEditor.XR.ARCore.ARCoreSettings: {fileID: 11400000, guid: f25adb7ae2be10d4cbb7ab742d595c49, type: 2}

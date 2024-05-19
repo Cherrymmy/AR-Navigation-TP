@@ -8,6 +8,10 @@ public class ARView : IUimenu
 {
     public Button naviChange;
 
+    private GoogleMap _googleMap;
+    private NaviMapRenderer _naviMapRenderer;
+    private MiniMapRenderer _miniMapRenderer;
+
     #region Swich 
     public override void Close()
     {
@@ -17,9 +21,9 @@ public class ARView : IUimenu
     public override void Open()
     {
         TargetSwitch();
-        UIManager.Instance.LoadingSet = false;
         OnDragAbleButton();
-        SceneManager.LoadScene(1);
+        SceneManager.LoadSceneAsync(1);
+        UIManager.Instance.LoadingSet = false;
     }
 
     public override void TargetSwitch()
@@ -32,16 +36,18 @@ public class ARView : IUimenu
 
     void Start()
     {
+        _googleMap = GameObject.Find("GoogleMap").GetComponent<GoogleMap>();
+        _naviMapRenderer = GameObject.Find("RawImage - NaviMap").GetComponent<NaviMapRenderer>();
+        _miniMapRenderer = GameObject.Find("RawImage - MiniMap").GetComponent<MiniMapRenderer>();
+
+
         naviChange.onClick.AddListener(Open);
     }
 
     private void OnDragAbleButton()
     {
-        GoogleMap googleMap = GameObject.Find("GoogleMap").GetComponent<GoogleMap>();
-
-        if (googleMap != null)
-        {
-            googleMap.IsDragZoomDisable = false;
-        }
+        _googleMap.IsDragZoomDisable = false;
+        _naviMapRenderer.enabled = true;
+        _miniMapRenderer.enabled = false;
     }
 }

@@ -39,5 +39,12 @@ public class StaticMapView : IUimenu
         {
             googleMap.IsDragZoomDisable = true;
         }
+
+        StaticMapRenderer staticMapRenderer = GameObject.Find("RawImage - StaticMap").GetComponent<StaticMapRenderer>();
+
+        if(staticMapRenderer != null)
+        {
+            staticMapRenderer.enabled = false;
+        }
     }
 }

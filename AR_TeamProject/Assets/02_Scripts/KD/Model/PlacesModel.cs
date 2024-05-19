@@ -21,6 +21,7 @@ namespace AR.Models
         private void Start()
         {
             _detailModel = FindObjectOfType<DetailModel>();
+            DontDestroyOnLoad(gameObject);
         }
 
         #region api 요청

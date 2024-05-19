@@ -17,18 +17,22 @@ public class NaviMapView : IUimenu
     public override void Close()
     {
         TargetSwitch2Meun();
+        OnEnableStatic();
         UIManager.Instance.LoadingSet = false;
     }
 
     public override void Open()
     {
         TargetSwitch();
-        UIManager.Instance.LoadingSet = false;
+        OnEnableMini();
 
         if (!Permission.HasUserAuthorizedPermission(Permission.Camera))
             StartCoroutine(CameraAR());
         else
-            SceneManager.LoadScene(2);
+            SceneManager.LoadSceneAsync(2);
+
+        UIManager.Instance.LoadingSet = false;
+
     }
 
     public override void TargetSwitch()
@@ -98,6 +102,40 @@ public class NaviMapView : IUimenu
         if (googleMap != null)
         {
             googleMap.IsDragZoomDisable = true;
+        }
+    }
+
+    private void OnEnableStatic()
+    {
+        StaticMapRenderer staticMapRenderer = GameObject.Find("RawImage - StaticMap").GetComponent<StaticMapRenderer>();
+
+        if (staticMapRenderer != null)
+        {
+            staticMapRenderer.enabled = true;
+        }
+
+        NaviMapRenderer naviMapRenderer = GameObject.Find("RawImage - NaviMap").GetComponent<NaviMapRenderer>();
+
+        if (naviMapRenderer != null)
+        {
+            naviMapRenderer.enabled = false;
+        }
+    }
+
+    private void OnEnableMini()
+    {
+        MiniMapRenderer miniMapRenderer = GameObject.Find("RawImage - MiniMap").GetComponent<MiniMapRenderer>();
+
+        if(miniMapRenderer != null)
+        {
+            miniMapRenderer.enabled = true;
+        }
+
+        NaviMapRenderer naviMapRenderer = GameObject.Find("RawImage - NaviMap").GetComponent<NaviMapRenderer>();
+
+        if (naviMapRenderer != null)
+        {
+            naviMapRenderer.enabled = false;
         }
     }
 }

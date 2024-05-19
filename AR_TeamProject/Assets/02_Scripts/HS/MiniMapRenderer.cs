@@ -15,7 +15,7 @@ public class MiniMapRenderer : MonoBehaviour, IDirectionMapObserver
     private float _gpsLon;
     private float _destinationLat;
     private float _destinationLon;
-    private int _zoom = 14;
+    private int _zoom = 15;
     private int _mapWidth;
     private int _mapHeight;
 
@@ -28,25 +28,23 @@ public class MiniMapRenderer : MonoBehaviour, IDirectionMapObserver
 
     public void UpdateData(float gpslat, float gpslon, float deslat, float deslon, float draglat, float draglon, int zoom, Vector2 markerPos)
     {
+        _mapData.IsGPSOn = true;
         _gpsLat = gpslat;
         _gpsLon = gpslon;
         _destinationLat = deslat;
         _destinationLon = deslon;
-
         StartCoroutine(GetDirectionsMap());
     }
 
 
     private void OnEnable() 
     {
-        _mapData = GameObject.Find("GoogleMap").GetComponent<GoogleMap>();
 
-        _mapData.ResisterDirectionMapObserver(this);
     }
 
     private void OnDisable()
     {
-        _mapData.RemoveDirectionMapObserver(this);
+        //_mapData.RemoveDirectionMapObserver(this);
     }
 
     void Start()
@@ -54,6 +52,10 @@ public class MiniMapRenderer : MonoBehaviour, IDirectionMapObserver
         _rect = GetComponent<RawImage>().rectTransform.rect;
         _mapWidth = (int)Math.Round(_rect.width);
         _mapHeight = (int)Math.Round(_rect.height);
+        _mapData = GameObject.Find("GoogleMap").GetComponent<GoogleMap>();
+
+        _mapData.ResisterDirectionMapObserver(this);
+        this.gameObject.GetComponent<MiniMapRenderer>().enabled = false;
 
         StartCoroutine(GetGoogleStaticMap());
     }

@@ -29,13 +29,15 @@ namespace AR
         public TMP_Text totalRiviews;
         public GameObject[] stars;
 
+        private DestinationNotify _destinationNotify;
 
         private void Start()
         {
+            _destinationNotify = FindAnyObjectByType<DestinationNotify>();
             /* Event */
             //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
             exitButton.onClick.AddListener(Close);
-            nextButton.onClick.AddListener(Open);
+            nextButton.onClick.AddListener(delegate { Open(); OnCurumi(); });
             //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
         }
         #region Swich 
@@ -49,6 +51,8 @@ namespace AR
         {
             TargetSwitch();
             UIManager.Instance.LoadingSet = false;
+            OnDisableButton();
+
         }
 
         public override void TargetSwitch()
@@ -77,6 +81,29 @@ namespace AR
                 {
                     stars[i].gameObject.SetActive(false);
                 }
+            }
+        }
+
+        public void OnCurumi()
+        {
+            _destinationNotify.AddDestination();
+            
+        }
+
+        private void OnDisableButton()
+        {
+            NaviMapRenderer naviMapRenderer = GameObject.Find("RawImage - NaviMap").GetComponent<NaviMapRenderer>();
+
+            if (naviMapRenderer != null)
+            {
+                naviMapRenderer.enabled = true;
+            }
+
+            DetailMapRenderer detailMapRenderer = GameObject.Find("RawImage - DetailMap").GetComponent<DetailMapRenderer>();
+
+            if(detailMapRenderer != null)
+            {
+                detailMapRenderer.enabled = false;
             }
         }
     }
