@@ -49,4 +49,11 @@
 >
 ***
 
-# 이미지 넣기 
+# APP Image
+## 김동영
+### 생성 삭제가 많은 UI오브젝트 오브젝트 풀링사용
+![오브젝트풀링](https://github.com/Cherrymmy/AR-Navigation-TP/assets/73081813/29c830ff-0424-4b24-aaf5-2c338020378f)
+### Google Places API를 사용하여 장소 검색
+![검색](https://github.com/Cherrymmy/AR-Navigation-TP/assets/73081813/5098e634-82b6-448a-aa3a-fa0597751aa7)
+### Google Places Detail을 사용하여 검색한 장소의 자세한 내용 검색
+![디테일표시](https://github.com/Cherrymmy/AR-Navigation-TP/assets/73081813/c15090ae-8d43-4a5d-99b5-91272bc2b898)
